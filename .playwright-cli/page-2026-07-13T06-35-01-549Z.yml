@@ -1,0 +1,197 @@
+- generic [ref=f3e3]:
+  - banner [ref=f3e4]:
+    - generic [ref=f3e5]:
+      - generic [ref=f3e6]: 🎲
+      - generic [ref=f3e7]:
+        - heading "Doraemon Monopoly" [level=1] [ref=f3e8]
+        - paragraph [ref=f3e9]: "Bản Miền Nam · Phòng: LOCAL"
+    - button "🔄 Ván Mới" [ref=f3e10] [cursor=pointer]
+  - main [ref=f3e11]:
+    - generic [ref=f3e13]:
+      - generic [ref=f3e14]:
+        - generic [ref=f3e30]:
+          - generic [ref=f3e31]: Doraemon
+          - generic [ref=f3e32]: $1,500
+        - generic [ref=f3e33]: Lượt
+      - generic [ref=f3e45]:
+        - generic [ref=f3e46]: Nobita
+        - generic [ref=f3e47]: $1,500
+      - generic [ref=f3e62]:
+        - generic [ref=f3e63]: Shizuka
+        - generic [ref=f3e64]: $1,500
+      - generic [ref=f3e77]:
+        - generic [ref=f3e78]: Suneo
+        - generic [ref=f3e79]: $1,500
+      - generic [ref=f3e92]:
+        - generic [ref=f3e93]: Giant
+        - generic [ref=f3e94]: $1,500
+      - generic [ref=f3e112]:
+        - generic [ref=f3e113]: Dorami
+        - generic [ref=f3e114]: $1,500
+    - generic [ref=f3e117]:
+      - generic [ref=f3e118] [cursor=pointer]:
+        - generic [ref=f3e119]: ⛓️
+        - generic [ref=f3e120]:
+          - generic [ref=f3e121]: THĂM TÙ
+          - generic [ref=f3e122]: Ở Tù
+      - generic [ref=f3e125] [cursor=pointer]:
+        - generic [ref=f3e126]: HOÀNG VĂN THỤ
+        - generic [ref=f3e127]: $140
+      - generic [ref=f3e129] [cursor=pointer]:
+        - generic [ref=f3e130]: 💡
+        - generic [ref=f3e131]: CÔNG TY ĐIỆN LỰC
+        - generic [ref=f3e132]: $200
+      - generic [ref=f3e135] [cursor=pointer]:
+        - generic [ref=f3e136]: TRƯỜNG CHINH
+        - generic [ref=f3e137]: $140
+      - generic [ref=f3e140] [cursor=pointer]:
+        - generic [ref=f3e141]: LÊ ĐẠI HÀNH
+        - generic [ref=f3e142]: $160
+      - generic [ref=f3e144] [cursor=pointer]:
+        - generic [ref=f3e145]: 🚌
+        - generic [ref=f3e146]: BẾN XE MIỀN ĐÔNG
+        - generic [ref=f3e147]: $200
+      - generic [ref=f3e150] [cursor=pointer]:
+        - generic [ref=f3e151]: NGUYỄN TRI PHƯƠNG
+        - generic [ref=f3e152]: $180
+      - generic [ref=f3e154] [cursor=pointer]:
+        - generic [ref=f3e155]: 🎁
+        - generic [ref=f3e156]: KHÍ VẬN
+      - generic [ref=f3e159] [cursor=pointer]:
+        - generic [ref=f3e160]: KHA VẠN CÂN
+        - generic [ref=f3e161]: $180
+      - generic [ref=f3e164] [cursor=pointer]:
+        - generic [ref=f3e165]: PHẠM THẾ HIỂN
+        - generic [ref=f3e166]: $200
+      - generic [ref=f3e167] [cursor=pointer]:
+        - generic [ref=f3e168]: 🚗
+        - generic [ref=f3e169]:
+          - generic [ref=f3e170]: ĐẬU XE
+          - generic [ref=f3e171]: Miễn Phí
+      - generic [ref=f3e174] [cursor=pointer]:
+        - generic [ref=f3e175]: CỘNG HÒA
+        - generic [ref=f3e176]: $120
+      - generic [ref=f3e178]:
+        - generic [ref=f3e179]:
+          - heading "CỜ TỶ PHÚ" [level=1] [ref=f3e181]
+          - generic [ref=f3e182]: Doraemon · Bản Miền Nam
+          - generic [ref=f3e183]: Quỹ thuế $0
+        - generic [ref=f3e189]:
+          - generic [ref=f3e190]:
+            - button "Mở bộ 16 thẻ Khí Vận" [ref=f3e191] [cursor=pointer]:
+              - generic [ref=f3e197]: Khí Vận
+            - generic [ref=f3e205]: Khí Vận
+          - generic [ref=f3e206]:
+            - generic [ref=f3e207]:
+              - generic [ref=f3e208]: Lượt chơi
+              - generic [ref=f3e209]: Doraemon
+            - paragraph [ref=f3e212]: Nhấn giữ để lắc
+          - generic [ref=f3e224]:
+            - button "Mở bộ 16 thẻ Cơ Hội" [ref=f3e225] [cursor=pointer]:
+              - generic [ref=f3e231]: Cơ Hội
+            - generic [ref=f3e238]: Cơ Hội
+        - generic [ref=f3e240]:
+          - generic [ref=f3e241]: Nhật ký
+          - generic [ref=f3e242]: • Welcome to Doraemon Monopoly. Roll dice to begin.
+      - generic [ref=f3e244] [cursor=pointer]:
+        - generic [ref=f3e245]: HUỲNH TẤN PHÁT
+        - generic [ref=f3e246]: $220
+      - generic [ref=f3e250] [cursor=pointer]:
+        - generic [ref=f3e251]: NGUYỄN KIỆM
+        - generic [ref=f3e252]: $100
+      - generic [ref=f3e254] [cursor=pointer]:
+        - generic [ref=f3e255]: ❓
+        - generic [ref=f3e256]: CƠ HỘI
+      - generic [ref=f3e258] [cursor=pointer]:
+        - generic [ref=f3e259]: ❓
+        - generic [ref=f3e260]: CƠ HỘI
+      - generic [ref=f3e262] [cursor=pointer]:
+        - generic [ref=f3e263]: HÙNG VƯƠNG
+        - generic [ref=f3e264]: $220
+      - generic [ref=f3e268] [cursor=pointer]:
+        - generic [ref=f3e269]: QUANG TRUNG
+        - generic [ref=f3e270]: $100
+      - generic [ref=f3e272] [cursor=pointer]:
+        - generic [ref=f3e273]: HẬU GIANG
+        - generic [ref=f3e274]: $240
+      - generic [ref=f3e277] [cursor=pointer]:
+        - generic [ref=f3e278]: 🚌
+        - generic [ref=f3e279]: BẾN XE CẦN GIUỘC
+        - generic [ref=f3e280]: $200
+      - generic [ref=f3e282] [cursor=pointer]:
+        - generic [ref=f3e283]: 🚌
+        - generic [ref=f3e284]: BẾN XE CHỢ LỚN
+        - generic [ref=f3e285]: $200
+      - generic [ref=f3e287] [cursor=pointer]:
+        - generic [ref=f3e288]: 💸
+        - generic [ref=f3e289]: THUẾ THU NHẬP
+        - generic [ref=f3e290]: $200
+      - generic [ref=f3e292] [cursor=pointer]:
+        - generic [ref=f3e293]: AN DƯƠNG VƯƠNG
+        - generic [ref=f3e294]: $260
+      - generic [ref=f3e298] [cursor=pointer]:
+        - generic [ref=f3e299]: LŨY BÁN BÍCH
+        - generic [ref=f3e300]: $60
+      - generic [ref=f3e302] [cursor=pointer]:
+        - generic [ref=f3e303]: NGUYỄN TRÃI
+        - generic [ref=f3e304]: $260
+      - generic [ref=f3e307] [cursor=pointer]:
+        - generic [ref=f3e308]: 🎁
+        - generic [ref=f3e309]: KHÍ VẬN
+      - generic [ref=f3e311] [cursor=pointer]:
+        - generic [ref=f3e312]: 🚰
+        - generic [ref=f3e313]: CÔNG TY CẤP NƯỚC
+        - generic [ref=f3e314]: $200
+      - generic [ref=f3e317] [cursor=pointer]:
+        - generic [ref=f3e318]: TÂN KỲ TÂN QUÝ
+        - generic [ref=f3e319]: $60
+      - generic [ref=f3e321] [cursor=pointer]:
+        - generic [ref=f3e322]: NGUYỄN TẤT THÀNH
+        - generic [ref=f3e323]: $280
+      - generic [ref=f3e325] [cursor=pointer]:
+        - generic [ref=f3e326]: 🚀
+        - generic [ref=f3e327]:
+          - generic [ref=f3e328]: BẮT ĐẦU
+          - generic [ref=f3e329]: Lãnh $200
+        - generic:
+          - generic:
+            - generic "Doraemon": D
+            - generic "Nobita": "N"
+            - generic "Shizuka": Sz
+            - generic "Suneo": Sn
+            - generic "Giant": G
+            - generic "Dorami": Dm
+      - generic [ref=f3e331] [cursor=pointer]:
+        - generic [ref=f3e332]: NGUYỄN HUỆ
+        - generic [ref=f3e333]: $400
+      - generic [ref=f3e336] [cursor=pointer]:
+        - generic [ref=f3e337]: 💸
+        - generic [ref=f3e338]: THUẾ ĐẶC BIỆT
+        - generic [ref=f3e339]: $100
+      - generic [ref=f3e341] [cursor=pointer]:
+        - generic [ref=f3e342]: LÊ LỢI
+        - generic [ref=f3e343]: $350
+      - generic [ref=f3e346] [cursor=pointer]:
+        - generic [ref=f3e347]: ❓
+        - generic [ref=f3e348]: CƠ HỘI
+      - generic [ref=f3e350] [cursor=pointer]:
+        - generic [ref=f3e351]: 🚌
+        - generic [ref=f3e352]: BẾN XE MIỀN TẤY
+        - generic [ref=f3e353]: $200
+      - generic [ref=f3e355] [cursor=pointer]:
+        - generic [ref=f3e356]: LƯƠNG ĐỊNH CỦA
+        - generic [ref=f3e357]: $320
+      - generic [ref=f3e360] [cursor=pointer]:
+        - generic [ref=f3e361]: 🎁
+        - generic [ref=f3e362]: KHÍ VẬN
+      - generic [ref=f3e364] [cursor=pointer]:
+        - generic [ref=f3e365]: VÕ THỊ SÁU
+        - generic [ref=f3e366]: $300
+      - generic [ref=f3e369] [cursor=pointer]:
+        - generic [ref=f3e370]: HAI BÀ TRƯNG
+        - generic [ref=f3e371]: $300
+      - generic [ref=f3e373] [cursor=pointer]:
+        - generic [ref=f3e374]: 👮
+        - generic [ref=f3e375]:
+          - generic [ref=f3e376]: VÀO TÙ
+          - generic [ref=f3e377]: → Ô 10
