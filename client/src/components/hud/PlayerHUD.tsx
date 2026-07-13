@@ -150,3 +150,35 @@ export const PlayerSeatCard: React.FC<PlayerSeatCardProps> = ({ player, isActive
     </div>
   );
 };
+
+export interface EmptySeatCardProps {
+  seatIndex: number;
+  onClick: () => void;
+}
+
+export const EmptySeatCard: React.FC<EmptySeatCardProps> = ({ seatIndex, onClick }) => {
+  return (
+    <div
+      onClick={onClick}
+      className="flex flex-col items-center select-none cursor-pointer group transition-all duration-200 hover:scale-105"
+      title="Bấm để mở phòng chờ / thêm người chơi"
+    >
+      <div className="rounded-full p-[2px] border-2 border-dashed border-amber-500/70 group-hover:border-amber-500 bg-amber-100/40 group-hover:bg-amber-200/60 transition-colors shadow-sm">
+        <div className="rounded-full w-14 h-14 md:w-16 md:h-16 flex flex-col items-center justify-center text-amber-800 group-hover:text-amber-950">
+          <span className="text-xl font-black">+</span>
+          <span className="text-[8px] font-black uppercase tracking-tight">Trống</span>
+        </div>
+      </div>
+
+      <div className="mt-1.5 flex flex-col items-center">
+        <div className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider text-slate-800 bg-white/90 group-hover:bg-amber-400 group-hover:text-slate-950 shadow border border-amber-300 transition-colors">
+          Ghế #{seatIndex + 1}
+        </div>
+        <div className="text-[10px] font-bold text-slate-600 mt-0.5">
+          + Mời / Thêm
+        </div>
+      </div>
+    </div>
+  );
+};
+
