@@ -144,7 +144,7 @@ export default function App() {
             if (player) {
               const isActive = idx === gameState.activePlayerIndex;
               return (
-                <div key={player.id} className={`hidden md:block ${seatClass}`}>
+                <div key={player.id} className={seatClass}>
                   <PlayerSeatCard player={player} isActive={isActive} />
                 </div>
               );
@@ -152,7 +152,7 @@ export default function App() {
 
             // Render Circular Empty Seat Slot when no user is seated
             return (
-              <div key={`empty-seat-${idx}`} className={`hidden md:block ${seatClass}`}>
+              <div key={`empty-seat-${idx}`} className={seatClass}>
                 <EmptySeatCard
                   seatIndex={idx}
                   onClick={() => setShowLobby(true)}

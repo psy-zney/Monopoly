@@ -10,8 +10,27 @@ export interface PlayerHUDProps {
 
 export const PlayerHUD: React.FC<PlayerHUDProps> = ({ players, activePlayerIndex }) => {
   return (
-    <div className="w-full max-w-[900px] mx-auto mb-3 grid grid-cols-3 md:grid-cols-6 gap-2">
-      {players.map((player, idx) => {
+    <div className="w-full max-w-[950px] mx-auto mb-3 grid grid-cols-3 md:grid-cols-6 gap-2">
+      {Array.from({ length: 6 }).map((_, idx) => {
+        const player = players[idx];
+
+        if (!player) {
+          return (
+            <div
+              key={`empty-top-${idx}`}
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border-2 border-dashed border-amber-400/70 bg-amber-50/50 select-none"
+            >
+              <div className="w-7 h-7 rounded-full border-2 border-dashed border-amber-500 flex items-center justify-center text-amber-700 font-black text-xs shrink-0 bg-white">
+                +
+              </div>
+              <div className="min-w-0">
+                <div className="text-[10px] font-black text-amber-900 uppercase">Ghế #{idx + 1}</div>
+                <div className="text-[8px] font-bold text-amber-600">Trống ●</div>
+              </div>
+            </div>
+          );
+        }
+
         const preset = SIX_PLAYER_PRESETS.find((p) => p.id === player.id) ?? SIX_PLAYER_PRESETS[0];
         const isActive = idx === activePlayerIndex;
 
@@ -160,25 +179,21 @@ export const EmptySeatCard: React.FC<EmptySeatCardProps> = ({ seatIndex, onClick
   return (
     <div
       onClick={onClick}
-      className="flex flex-col items-center select-none cursor-pointer group transition-all duration-200 hover:scale-105"
+      className="flex flex-col items-center select-none cursor-pointer group transition-all duration-300 hover:scale-110"
       title="Bấm để mở phòng chờ / thêm người chơi"
     >
-      <div className="rounded-full p-[2px] border-2 border-dashed border-amber-500/70 group-hover:border-amber-500 bg-amber-100/40 group-hover:bg-amber-200/60 transition-colors shadow-sm">
-        <div className="rounded-full w-14 h-14 md:w-16 md:h-16 flex flex-col items-center justify-center text-amber-800 group-hover:text-amber-950">
-          <span className="text-xl font-black">+</span>
-          <span className="text-[8px] font-black uppercase tracking-tight">Trống</span>
+      {/* Pure Circular Empty Slot */}
+      <div className="relative rounded-full p-[3px] border-2 border-dashed border-amber-500/80 group-hover:border-amber-400 bg-amber-100/60 group-hover:bg-amber-300/60 transition-all shadow-md">
+        <div className="rounded-full w-14 h-14 md:w-16 md:h-16 flex flex-col items-center justify-center bg-white/90 border border-amber-400/50 text-amber-800 group-hover:text-amber-950">
+          <span className="text-2xl font-black leading-none">+</span>
+          <span className="text-[9px] font-black uppercase tracking-tighter mt-0.5">TRỐNG</span>
         </div>
-      </div>
-
-      <div className="mt-1.5 flex flex-col items-center">
-        <div className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider text-slate-800 bg-white/90 group-hover:bg-amber-400 group-hover:text-slate-950 shadow border border-amber-300 transition-colors">
+        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-slate-900 border border-amber-400 text-[8px] font-black text-amber-300 uppercase whitespace-nowrap shadow">
           Ghế #{seatIndex + 1}
-        </div>
-        <div className="text-[10px] font-bold text-slate-600 mt-0.5">
-          + Mời / Thêm
         </div>
       </div>
     </div>
   );
 };
+
 
