@@ -14,7 +14,7 @@
 
   body {
     @apply antialiased;
-    background: #f5f0dc;
+    background: #0c3328;
     min-height: 100vh;
     font-family: 'Nunito', sans-serif;
     color: #1a1a1a;
@@ -133,3 +133,687 @@
     .chance-deck-position .card-stack-wrap { width: 44px !important; }
   }
 }
+
+@layer components {
+  .game-shell {
+    display: flex;
+    flex-direction: column;
+    background:
+      radial-gradient(circle at 50% 45%, rgba(77, 160, 110, 0.26), transparent 44%),
+      linear-gradient(145deg, #102f27 0%, #071c17 100%);
+  }
+
+  .safe-ui {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .game-header {
+    position: relative;
+    z-index: 40;
+    min-height: 68px;
+    border-bottom: 1px solid rgba(251, 191, 36, 0.28);
+    background: linear-gradient(90deg, rgba(4, 26, 21, 0.96), rgba(13, 60, 47, 0.94));
+    box-shadow: 0 12px 30px rgba(1, 14, 11, 0.32);
+    backdrop-filter: blur(18px);
+  }
+
+  .game-header-button {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.85rem;
+    padding: 0.55rem 0.85rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 900;
+    transition: transform 160ms ease-out, background-color 160ms ease-out, border-color 160ms ease-out;
+  }
+
+  .game-header-button:hover {
+    border-color: rgba(252, 211, 77, 0.75);
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .game-header-button:focus-visible {
+    outline: 3px solid #fbbf24;
+    outline-offset: 3px;
+  }
+
+  .game-header-button-primary {
+    border-color: rgba(252, 211, 77, 0.58);
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: #231405;
+  }
+
+  .game-table-surface::before {
+    position: absolute;
+    inset: 2.5%;
+    border: 1px solid rgba(250, 204, 21, 0.12);
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, rgba(33, 106, 76, 0.4) 0%, rgba(10, 57, 43, 0.78) 56%, rgba(4, 29, 23, 0.94) 100%),
+      repeating-radial-gradient(circle, rgba(255, 255, 255, 0.015) 0 1px, transparent 1px 4px);
+    box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.42), 0 18px 60px rgba(0, 0, 0, 0.35);
+    content: '';
+    pointer-events: none;
+  }
+
+  .table-ambient-ring {
+    position: absolute;
+    inset: 8% 9%;
+    z-index: 0;
+    border: 2px solid rgba(251, 191, 36, 0.14);
+    border-radius: 18%;
+    box-shadow: 0 0 60px rgba(251, 191, 36, 0.08);
+    pointer-events: none;
+  }
+
+  .monopoly-board-frame {
+    overflow: hidden;
+    border: 7px solid #c4a348;
+    border-radius: 0.9rem;
+    background: white;
+    box-shadow:
+      0 0 0 3px rgba(255, 240, 167, 0.48),
+      0 22px 48px rgba(0, 0, 0, 0.38),
+      0 5px 0 #74511d,
+      inset 0 0 0 1px rgba(255, 255, 255, 0.68);
+  }
+
+  .player-seat-card {
+    position: relative;
+    display: flex;
+    width: 116px;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 1rem;
+    filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.32));
+    transform-origin: center bottom;
+  }
+
+  .player-seat-glow {
+    position: absolute;
+    inset: 12px 10px 4px;
+    z-index: -1;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--player-color) 34%, transparent);
+    filter: blur(14px);
+    opacity: 0.45;
+  }
+
+  .player-seat-active .player-seat-glow {
+    opacity: 0.95;
+    animation: seat-glow 1.5s ease-in-out infinite;
+  }
+
+  .player-seat-info {
+    display: flex;
+    min-width: 104px;
+    translate: 0 -7px;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid color-mix(in srgb, var(--player-color) 72%, white);
+    border-radius: 0.85rem;
+    padding: 0.35rem 0.55rem;
+    background: linear-gradient(160deg, rgba(7, 24, 21, 0.94), rgba(11, 45, 35, 0.92));
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(8px);
+  }
+
+  .center-hub {
+    position: relative;
+    border: 3px solid #b9983d;
+    border-radius: 0.65rem;
+    background:
+      radial-gradient(circle at center, rgba(255, 255, 255, 0.95), rgba(249, 245, 222, 0.96) 58%, rgba(220, 235, 210, 0.96));
+    box-shadow: inset 0 0 32px rgba(80, 108, 65, 0.14);
+  }
+
+  .center-hub::before {
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(125, 94, 26, 0.18);
+    border-radius: 0.45rem;
+    content: '';
+    pointer-events: none;
+  }
+
+  .center-brand {
+    background: linear-gradient(135deg, #b91c1c, #e44725);
+    box-shadow: 0 5px 14px rgba(153, 27, 27, 0.28), inset 0 1px rgba(255, 255, 255, 0.3);
+  }
+
+  .tax-pot-pill {
+    border: 1px solid #d6ad36;
+    background: linear-gradient(135deg, #fff0a8, #f5c84b);
+    box-shadow: 0 3px 10px rgba(120, 82, 9, 0.16);
+  }
+
+  .turn-owner-pill {
+    border-radius: 0.8rem;
+    padding: 0.3rem 0.75rem;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 3px 12px rgba(58, 78, 47, 0.12);
+  }
+
+  .end-turn-button {
+    background: linear-gradient(135deg, #15803d, #22a85a);
+    box-shadow: 0 7px 16px rgba(21, 128, 61, 0.28);
+    transition: transform 150ms ease-out, filter 150ms ease-out;
+  }
+
+  .end-turn-button:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+  .game-log {
+    border: 1px solid rgba(154, 121, 46, 0.22);
+    background: rgba(255, 252, 236, 0.78);
+    box-shadow: inset 0 1px 8px rgba(101, 73, 20, 0.06);
+  }
+
+  .fortune-deck-zone::before {
+    position: absolute;
+    inset: -16px;
+    z-index: -1;
+    border-radius: 999px;
+    content: '';
+    opacity: 0.22;
+    filter: blur(10px);
+    animation: fortune-aura 2.4s ease-in-out infinite;
+  }
+
+  .fortune-deck-community::before { background: #10b981; }
+  .fortune-deck-chance::before { background: #ef4444; animation-delay: -1.2s; }
+
+  .dice-console {
+    display: flex;
+    min-height: 138px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dice-bowl-button {
+    position: relative;
+    display: grid;
+    min-width: 148px;
+    min-height: 116px;
+    place-items: center;
+    border: 0;
+    border-radius: 1.25rem;
+    background: transparent;
+    color: inherit;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .dice-bowl-button:hover:not(:disabled) {
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.12), transparent 68%);
+  }
+
+  .dice-bowl-button:focus-visible {
+    outline: 3px solid #0f766e;
+    outline-offset: 2px;
+  }
+
+  .dice-bowl-button:disabled { cursor: not-allowed; }
+
+  .dice-bowl-button.is-shaking svg {
+    animation: bowl-shake 100ms ease-in-out infinite alternate;
+    transform-origin: center bottom;
+  }
+
+  .dice-bowl-shadow {
+    position: absolute;
+    bottom: 9px;
+    left: 50%;
+    width: 88px;
+    height: 13px;
+    translate: -50% 0;
+    border-radius: 50%;
+    background: rgba(18, 44, 32, 0.22);
+    filter: blur(5px);
+  }
+
+  .shake-energy {
+    position: absolute;
+    right: 7px;
+    bottom: 18px;
+    left: 7px;
+    height: 5px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(83, 56, 14, 0.16);
+  }
+
+  .shake-energy span {
+    display: block;
+    width: 48%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #f59e0b, #fef08a, #f59e0b);
+    animation: shake-energy 480ms ease-in-out infinite alternate;
+  }
+
+  .dice-result-panel {
+    border: 1px solid rgba(163, 126, 39, 0.22);
+    border-radius: 1rem;
+    padding: 0.65rem 0.9rem;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 8px 24px rgba(52, 73, 48, 0.13);
+  }
+
+  .dice-face {
+    display: block;
+    border-radius: 20%;
+    filter: drop-shadow(0 6px 7px rgba(42, 33, 13, 0.2));
+  }
+
+  .dice-total {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.9rem;
+    font-weight: 900;
+    line-height: 1;
+    color: #9a6d14;
+  }
+
+  .double-badge {
+    border: 1px solid #fca5a5;
+    border-radius: 999px;
+    padding: 0.2rem 0.5rem;
+    background: #fff1f2;
+    color: #be123c;
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .money-event-card {
+    display: flex;
+    min-width: 138px;
+    align-items: center;
+    gap: 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 1rem;
+    padding: 0.55rem 0.75rem;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(12px);
+  }
+
+  .money-event-positive { background: linear-gradient(135deg, rgba(5, 150, 105, 0.95), rgba(22, 163, 74, 0.94)); }
+  .money-event-negative { background: linear-gradient(135deg, rgba(190, 24, 93, 0.95), rgba(225, 29, 72, 0.94)); }
+
+  .fortune-toast {
+    display: flex;
+    max-width: min(560px, 82vw);
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 1rem;
+    padding: 0.7rem 1rem;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+    backdrop-filter: blur(16px);
+  }
+
+  .fortune-toast-chance { background: linear-gradient(135deg, rgba(159, 18, 57, 0.96), rgba(220, 38, 38, 0.94)); }
+  .fortune-toast-community { background: linear-gradient(135deg, rgba(4, 120, 87, 0.96), rgba(5, 150, 105, 0.94)); }
+}
+
+@keyframes seat-glow {
+  0%, 100% { transform: scale(0.92); filter: blur(13px); }
+  50% { transform: scale(1.12); filter: blur(17px); }
+}
+
+@keyframes fortune-aura {
+  0%, 100% { transform: scale(0.84); opacity: 0.14; }
+  50% { transform: scale(1.12); opacity: 0.34; }
+}
+
+@keyframes bowl-shake {
+  from { transform: translateX(-4px) rotate(-7deg); }
+  to { transform: translateX(4px) rotate(7deg); }
+}
+
+@keyframes shake-energy {
+  from { transform: translateX(0); }
+  to { transform: translateX(108%); }
+}
+
+@media (max-width: 767px) {
+  .game-table-surface::before { inset: 1%; border-radius: 1.25rem; }
+  .game-header { min-height: 62px; }
+  .fortune-toast { max-width: 92vw; }
+
+  .mobile-player-strip {
+    position: relative;
+    z-index: 25;
+  }
+
+  .player-hud-grid {
+    display: flex;
+    max-width: none;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0.35rem 0.2rem 0.5rem;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  .player-hud-grid > * {
+    min-width: 156px;
+    scroll-snap-align: start;
+  }
+}
+
+@container (max-width: 430px) {
+  .center-hub > div:first-child { padding-top: 0.4rem; }
+  .center-brand { margin-bottom: 0; padding: 0.25rem 0.65rem; }
+  .center-brand h1 { font-size: 0.75rem; }
+  .center-brand + div { display: none; }
+  .tax-pot-pill { margin-top: 0.2rem; padding: 0.18rem 0.5rem; font-size: 0.7rem; }
+  .turn-owner-pill { padding: 0.18rem 0.45rem; }
+  .turn-owner-pill > div:first-child { font-size: 0.65rem; }
+  .turn-owner-pill > div:nth-child(2) { font-size: 0.78rem; }
+  .dice-console { min-height: 102px; }
+  .dice-bowl-button { min-width: 112px; min-height: 92px; }
+  .dice-bowl-button svg { width: 98px; height: 90px; }
+  .dice-result-panel { padding: 0.35rem 0.5rem; }
+  .dice-face { width: 44px; height: 44px; }
+  .dice-total { font-size: 1.45rem; }
+  .double-badge { font-size: 0.65rem; }
+  .game-log { max-height: 54px; padding: 0.35rem 0.55rem; }
+  .game-log > div:first-child { margin-bottom: 0.15rem; font-size: 0.65rem; }
+  .game-log > div:not(:first-child) { font-size: 0.65rem; }
+  .game-log > div:nth-child(n+3) { display: none; }
+  .fortune-deck-zone .deck-caption { display: none; }
+  .community-deck-position .card-stack-wrap,
+  .chance-deck-position .card-stack-wrap { width: 38px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+}
+
+/* From Uiverse.io by Nawsome */ 
+.wheel-and-hamster {
+  --dur: 1s;
+  position: relative;
+  width: 12em;
+  height: 12em;
+  font-size: 14px;
+}
+
+.wheel,
+.hamster,
+.hamster div,
+.spoke {
+  position: absolute;
+}
+
+.wheel,
+.spoke {
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.wheel {
+  background: radial-gradient(100% 100% at center,hsla(0,0%,60%,0) 47.8%,hsl(0,0%,60%) 48%);
+  z-index: 2;
+}
+
+.hamster {
+  animation: hamster var(--dur) ease-in-out infinite;
+  top: 50%;
+  left: calc(50% - 3.5em);
+  width: 7em;
+  height: 3.75em;
+  transform: rotate(4deg) translate(-0.8em,1.85em);
+  transform-origin: 50% 0;
+  z-index: 1;
+}
+
+.hamster__head {
+  animation: hamsterHead var(--dur) ease-in-out infinite;
+  background: hsl(30,90%,55%);
+  border-radius: 70% 30% 0 100% / 40% 25% 25% 60%;
+  box-shadow: 0 -0.25em 0 hsl(30,90%,80%) inset,
+		0.75em -1.55em 0 hsl(30,90%,90%) inset;
+  top: 0;
+  left: -2em;
+  width: 2.75em;
+  height: 2.5em;
+  transform-origin: 100% 50%;
+}
+
+.hamster__ear {
+  animation: hamsterEar var(--dur) ease-in-out infinite;
+  background: hsl(0,90%,85%);
+  border-radius: 50%;
+  box-shadow: -0.25em 0 hsl(30,90%,55%) inset;
+  top: -0.25em;
+  right: -0.25em;
+  width: 0.75em;
+  height: 0.75em;
+  transform-origin: 50% 75%;
+}
+
+.hamster__eye {
+  animation: hamsterEye var(--dur) linear infinite;
+  background-color: hsl(0,0%,0%);
+  border-radius: 50%;
+  top: 0.375em;
+  left: 1.25em;
+  width: 0.5em;
+  height: 0.5em;
+}
+
+.hamster__nose {
+  background: hsl(0,90%,75%);
+  border-radius: 35% 65% 85% 15% / 70% 50% 50% 30%;
+  top: 0.75em;
+  left: 0;
+  width: 0.2em;
+  height: 0.25em;
+}
+
+.hamster__body {
+  animation: hamsterBody var(--dur) ease-in-out infinite;
+  background: hsl(30,90%,90%);
+  border-radius: 50% 30% 50% 30% / 15% 60% 40% 40%;
+  box-shadow: 0.1em 0.75em 0 hsl(30,90%,55%) inset,
+		0.15em -0.5em 0 hsl(30,90%,80%) inset;
+  top: 0.25em;
+  left: 2em;
+  width: 4.5em;
+  height: 3em;
+  transform-origin: 17% 50%;
+  transform-style: preserve-3d;
+}
+
+.hamster__limb--fr,
+.hamster__limb--fl {
+  clip-path: polygon(0 0,100% 0,70% 80%,60% 100%,0% 100%,40% 80%);
+  top: 2em;
+  left: 0.5em;
+  width: 1em;
+  height: 1.5em;
+  transform-origin: 50% 0;
+}
+
+.hamster__limb--fr {
+  animation: hamsterFRLimb var(--dur) linear infinite;
+  background: linear-gradient(hsl(30,90%,80%) 80%,hsl(0,90%,75%) 80%);
+  transform: rotate(15deg) translateZ(-1px);
+}
+
+.hamster__limb--fl {
+  animation: hamsterFLLimb var(--dur) linear infinite;
+  background: linear-gradient(hsl(30,90%,90%) 80%,hsl(0,90%,85%) 80%);
+  transform: rotate(15deg);
+}
+
+.hamster__limb--br,
+.hamster__limb--bl {
+  border-radius: 0.75em 0.75em 0 0;
+  clip-path: polygon(0 0,100% 0,100% 30%,70% 90%,70% 100%,30% 100%,40% 90%,0% 30%);
+  top: 1em;
+  left: 2.8em;
+  width: 1.5em;
+  height: 2.5em;
+  transform-origin: 50% 30%;
+}
+
+.hamster__limb--br {
+  animation: hamsterBRLimb var(--dur) linear infinite;
+  background: linear-gradient(hsl(30,90%,80%) 90%,hsl(0,90%,75%) 90%);
+  transform: rotate(-25deg) translateZ(-1px);
+}
+
+.hamster__limb--bl {
+  animation: hamsterBLLimb var(--dur) linear infinite;
+  background: linear-gradient(hsl(30,90%,90%) 90%,hsl(0,90%,85%) 90%);
+  transform: rotate(-25deg);
+}
+
+.hamster__tail {
+  animation: hamsterTail var(--dur) linear infinite;
+  background: hsl(0,90%,85%);
+  border-radius: 0.25em 50% 50% 0.25em;
+  box-shadow: 0 -0.2em 0 hsl(0,90%,75%) inset;
+  top: 1.5em;
+  right: -0.5em;
+  width: 1em;
+  height: 0.5em;
+  transform: rotate(30deg) translateZ(-1px);
+  transform-origin: 0.25em 0.25em;
+}
+
+.spoke {
+  animation: spoke var(--dur) linear infinite;
+  background: radial-gradient(100% 100% at center,hsl(0,0%,60%) 4.8%,hsla(0,0%,60%,0) 5%),
+		linear-gradient(hsla(0,0%,55%,0) 46.9%,hsl(0,0%,65%) 47% 52.9%,hsla(0,0%,65%,0) 53%) 50% 50% / 99% 99% no-repeat;
+}
+
+/* Animations */
+@keyframes hamster {
+  from, to {
+    transform: rotate(4deg) translate(-0.8em,1.85em);
+  }
+
+  50% {
+    transform: rotate(0) translate(-0.8em,1.85em);
+  }
+}
+
+@keyframes hamsterHead {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(0);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes hamsterEye {
+  from, 90%, to {
+    transform: scaleY(1);
+  }
+
+  95% {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes hamsterEar {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(0);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes hamsterBody {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(0);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes hamsterFRLimb {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(50deg) translateZ(-1px);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(-30deg) translateZ(-1px);
+  }
+}
+
+@keyframes hamsterFLLimb {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(-30deg);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(50deg);
+  }
+}
+
+@keyframes hamsterBRLimb {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(-60deg) translateZ(-1px);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(20deg) translateZ(-1px);
+  }
+}
+
+@keyframes hamsterBLLimb {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(20deg);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(-60deg);
+  }
+}
+
+@keyframes hamsterTail {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(30deg) translateZ(-1px);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(10deg) translateZ(-1px);
+  }
+}
+
+@keyframes spoke {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(-1turn);
+  }
+}
+

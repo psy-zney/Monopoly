@@ -13,40 +13,82 @@ export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
 }) => {
   const [progress, setProgress] = useState(0);
   const [stepIndex, setStepIndex] = useState(0);
+  const [serverReady, setServerReady] = useState(false);
 
   const steps = [
     'Đang tải dữ liệu bàn cờ Miền Nam...',
     'Khởi tạo 40 ô đất, Nhà & Khách Sạn...',
     'Đồng bộ luật chơi chuẩn Hasbro...',
-    'Kết nối phòng chơi & Hàng chờ...',
+    'Đang kết nối & đánh thức máy chủ (Server)...',
+    'Đang kết nối & đánh thức máy chủ (Server)...', // Duplicate to hold at this step if waiting
     'Hoàn tất! Sẵn sàng vào ván đấu...',
   ];
 
+  // Ping backend to wake it up
+  useEffect(() => {
+    let isMounted = true;
+    const url = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+    
+    const pingServer = async () => {
+      try {
+        const response = await fetch(`${url}/health`);
+        if (response.ok && isMounted) {
+          setServerReady(true);
+        } else {
+          if (isMounted) setTimeout(pingServer, 2000);
+        }
+      } catch (error) {
+        // Server might be asleep, try again in 2 seconds
+        if (isMounted) setTimeout(pingServer, 2000);
+      }
+    };
+    
+    pingServer();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   useEffect(() => {
     const startTime = Date.now();
-    const totalDuration = 1400; // 1.4s smooth loading experience
+    const minDuration = 1500; // minimum loading time
 
     const timer = setInterval(() => {
       const elapsed = Date.now() - startTime;
-      const nextProgress = Math.min(100, Math.floor((elapsed / totalDuration) * 100));
+      let nextProgress = Math.floor((elapsed / minDuration) * 100);
+      
+      // If server isn't ready yet, hold progress at 85% maximum
+      if (!serverReady && nextProgress > 85) {
+        nextProgress = 85;
+      }
+      
+      if (nextProgress > 100) nextProgress = 100;
+      
       setProgress(nextProgress);
 
-      const nextStepIndex = Math.min(
+      let nextStepIndex = Math.min(
         steps.length - 1,
         Math.floor((nextProgress / 100) * steps.length)
       );
+      
+      // Force step text to "Connecting" if waiting for server
+      if (!serverReady && nextProgress === 85) {
+        nextStepIndex = 3;
+      }
+      
       setStepIndex(nextStepIndex);
 
-      if (nextProgress >= 100) {
+      if (nextProgress >= 100 && serverReady) {
         clearInterval(timer);
         setTimeout(() => {
           onFinish();
-        }, 200);
+        }, 300);
       }
     }, 40);
 
     return () => clearInterval(timer);
-  }, [onFinish, steps.length]);
+  }, [onFinish, steps.length, serverReady]);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-md px-4 select-none">
@@ -56,13 +98,25 @@ export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
 
       {/* Main Card */}
       <div className="relative z-10 flex flex-col items-center max-w-sm w-full p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl">
-        {/* Animated Dice Logo Wrapper */}
-        <div className="relative mb-6">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-red-600 to-amber-500 flex items-center justify-center text-4xl shadow-lg shadow-red-500/30 animate-bounce">
-            🎲
-          </div>
-          <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-blue-600 border-2 border-slate-900 flex items-center justify-center text-xs text-white font-black shadow">
-            🔔
+        {/* Hamster Loading Animation */}
+        <div className="mb-8">
+          <div aria-label="Orange and tan hamster running in a metal wheel" role="img" className="wheel-and-hamster">
+            <div className="wheel"></div>
+            <div className="hamster">
+              <div className="hamster__body">
+                <div className="hamster__head">
+                  <div className="hamster__ear"></div>
+                  <div className="hamster__eye"></div>
+                  <div className="hamster__nose"></div>
+                </div>
+                <div className="hamster__limb hamster__limb--fr"></div>
+                <div className="hamster__limb hamster__limb--fl"></div>
+                <div className="hamster__limb hamster__limb--br"></div>
+                <div className="hamster__limb hamster__limb--bl"></div>
+                <div className="hamster__tail"></div>
+              </div>
+            </div>
+            <div className="spoke"></div>
           </div>
         </div>
 
@@ -78,11 +132,15 @@ export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
         </p>
 
         {/* Progress Bar */}
-        <div className="w-full h-3.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700/60 mb-4">
+        <div className="w-full h-3.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700/60 mb-4 relative">
           <div
             className="h-full bg-gradient-to-r from-blue-500 via-amber-400 to-emerald-400 rounded-full transition-all duration-100 ease-out shadow-sm"
             style={{ width: `${progress}%` }}
           />
+          {/* Waiting for server pulse effect */}
+          {!serverReady && progress === 85 && (
+            <div className="absolute inset-0 bg-white/20 animate-pulse rounded-full" />
+          )}
         </div>
 
         {/* Step Status Text */}
@@ -94,3 +152,4 @@ export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
     </div>
   );
 };
+

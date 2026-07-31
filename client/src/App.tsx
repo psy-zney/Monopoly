@@ -1,19 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { RotateCcw, Sparkles, UsersRound, Volume2, VolumeX } from 'lucide-react';
 import { useGameStore } from './store/useGameStore';
 import { MonopolyBoard } from './components/board/MonopolyBoard';
-import { PlayerHUD, PlayerSeatCard, EmptySeatCard } from './components/hud/PlayerHUD';
+import { PlayerHUD, PlayerSeatCard } from './components/hud/PlayerHUD';
+import { GameEventLayer } from './components/effects/GameEventLayer';
 import { TitleDeedModal } from './components/modals/TitleDeedModal';
 import { AuctionModal } from './components/modals/AuctionModal';
 import { GameLoadingScreen } from './components/modals/GameLoadingScreen';
 import { LobbyModal } from './components/modals/LobbyModal';
 import { VIETNAMESE_BOARD_SPACES } from './core/constants/vietnameseBoardData';
+import { gameAudio } from './audio/audioManager';
 
 export default function App() {
-  const { gameState, dispatch, resetGame } = useGameStore();
+  const { gameState, online, dispatch, resetGame } = useGameStore();
   const activePlayer = gameState.players[gameState.activePlayerIndex];
+  const visiblePlayers = online.roomCode
+    ? gameState.players.filter((player) =>
+        online.players.some((roomPlayer) => roomPlayer.playerId === player.id && roomPlayer.connected),
+      )
+    : gameState.players;
 
   const [showLoading, setShowLoading] = useState(true);
   const [showLobby, setShowLobby] = useState(false);
+  const [muted, setMuted] = useState(() => gameAudio.isMuted);
+  const [showDesktopSeats, setShowDesktopSeats] = useState(() => window.matchMedia('(min-width: 768px)').matches);
   const [playerName, setPlayerName] = useState(() => {
     return localStorage.getItem('doraemon_monopoly_name') || 'Người Chơi 1';
   });
@@ -22,6 +32,19 @@ export default function App() {
     setPlayerName(name);
     localStorage.setItem('doraemon_monopoly_name', name);
   };
+
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 768px)');
+    const update = () => setShowDesktopSeats(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    const startAudio = () => gameAudio.initFromGesture();
+    window.addEventListener('pointerdown', startAudio, { capture: true, once: true });
+    return () => window.removeEventListener('pointerdown', startAudio, { capture: true });
+  }, []);
 
   const selectedSpace =
     gameState.selectedSpaceIndex !== null
@@ -37,21 +60,18 @@ export default function App() {
       ? VIETNAMESE_BOARD_SPACES[gameState.auctionState.spaceIndex]
       : null;
 
-  // 6 fixed desktop seat positions around the board
+  // Stable anchors preserve the feeling of people sitting around one shared table.
   const seatPositions = [
-    /* Seat 1 (Bottom Left) */ 'absolute bottom-8 left-2',
-    /* Seat 2 (Middle Left) */ 'absolute top-1/2 -translate-y-1/2 left-2',
-    /* Seat 3 (Top Left)    */ 'absolute top-8 left-2',
-    /* Seat 4 (Top Right)   */ 'absolute top-8 right-2',
-    /* Seat 5 (Middle Right)*/ 'absolute top-1/2 -translate-y-1/2 right-2',
-    /* Seat 6 (Bottom Right)*/ 'absolute bottom-8 right-2',
+    'absolute bottom-1 left-[15%]',
+    'absolute left-1 top-1/2 -translate-y-1/2',
+    'absolute left-[15%] top-1',
+    'absolute right-[15%] top-1',
+    'absolute right-1 top-1/2 -translate-y-1/2',
+    'absolute bottom-1 right-[15%]',
   ];
 
   return (
-    <div
-      className="h-screen flex flex-col overflow-hidden"
-      style={{ background: '#f5f0dc' }}
-    >
+    <div className="game-shell h-screen overflow-hidden">
       {/* Loading Screen */}
       {showLoading && (
         <GameLoadingScreen
@@ -70,92 +90,78 @@ export default function App() {
         currentPlayerName={playerName}
       />
 
+      <GameEventLayer gameState={gameState} />
+
       {/* ── HEADER ── */}
-      <header
-        className="w-full py-2.5 px-4 md:px-8 flex items-center justify-between shadow-sm z-30"
-        style={{
-          background: '#fff',
-          borderBottom: '2px solid #c8a951',
-        }}
-      >
+      <header className="game-header safe-ui flex w-full items-center justify-between px-4 py-2.5 md:px-8">
         <div className="flex items-center gap-3">
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-xl font-black shrink-0 shadow"
-            style={{ background: '#dc2626' }}
-          >
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-amber-300 to-orange-500 text-2xl shadow-lg shadow-amber-950/20">
             🎲
           </div>
           <div>
-            <h1
-              className="text-base md:text-lg font-black uppercase tracking-widest text-slate-900"
-              style={{ fontFamily: 'Baloo 2, cursive' }}
-            >
-              Doraemon Monopoly
+            <h1 className="flex items-center gap-2 text-base font-black uppercase tracking-[0.16em] text-white md:text-xl">
+              Cờ Tỷ Phú Mèo <Sparkles className="text-amber-300" size={17} />
             </h1>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-              Tên: <span className="text-amber-700 font-black">{playerName}</span> · Phòng:{' '}
-              <span className="font-mono text-slate-700">{gameState.roomCode}</span>
+            <p className="mt-0.5 text-xs font-bold text-emerald-100/75">
+              <span className="font-black text-amber-300">{playerName}</span> · Phòng{' '}
+              <span className="font-mono text-white">{gameState.roomCode}</span> · {visiblePlayers.length} người
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => setShowLobby(true)}
-            className="px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all hover:brightness-95 active:scale-95 shadow-sm"
-            style={{
-              background: '#fef3c7',
-              border: '2px solid #f59e0b',
-              color: '#92400e',
-            }}
+            className="game-header-button game-header-button-primary"
+            aria-label="Mở danh sách người chơi và đổi tên"
           >
-            🪑 Hàng Chờ & Tên
+            <UsersRound size={17} /> <span className="hidden sm:inline">Người chơi</span>
           </button>
           <button
-            onClick={() => resetGame(6)}
-            className="px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all hover:brightness-95 active:scale-95"
-            style={{
-              background: '#fff',
-              border: '2px solid #e2d9b0',
-              color: '#555',
+            type="button"
+            onClick={() => {
+              gameAudio.toggleMuted();
+              setMuted(gameAudio.isMuted);
             }}
+            className="game-header-button game-header-audio-button"
+            aria-label={muted ? 'Bật âm thanh' : 'Tắt âm thanh'}
+            title={muted ? 'Bật âm thanh' : 'Tắt âm thanh'}
           >
-            🔄 Ván Mới
+            {muted ? <VolumeX size={17} /> : <Volume2 size={17} />}
+          </button>
+          <button
+            type="button"
+            onClick={() => resetGame(6)}
+            className="game-header-button"
+            aria-label="Bắt đầu ván mới với sáu người chơi"
+          >
+            <RotateCcw size={17} /> <span className="hidden sm:inline">Ván mới</span>
           </button>
         </div>
       </header>
 
       {/* ── MAIN ── */}
-      <main className="flex-1 flex flex-col items-center justify-center p-3 min-h-0 overflow-hidden relative">
+      <main className="game-table-surface relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden p-2 md:p-3">
         {/* On Mobile: standard top HUD bar */}
-        <div className="w-full md:hidden shrink-0">
+        <div className="mobile-player-strip w-full shrink-0 md:hidden">
           <PlayerHUD
-            players={gameState.players}
-            activePlayerIndex={gameState.activePlayerIndex}
+            players={visiblePlayers}
+            activePlayerId={activePlayer?.id}
           />
         </div>
 
-        {/* Board with Seated Players & Empty Circular Slots on Desktop */}
-        <div className="relative flex h-full w-full max-w-[1000px] justify-center px-1 py-2 md:max-h-[calc(100vh-80px)] md:px-20">
-          {/* Render all 6 seat positions around the board */}
-          {seatPositions.map((seatClass, idx) => {
-            const player = gameState.players[idx];
-
-            if (player) {
-              const isActive = idx === gameState.activePlayerIndex;
-              return (
-                <div key={player.id} className={seatClass}>
-                  <PlayerSeatCard player={player} isActive={isActive} />
-                </div>
-              );
-            }
-
-            // Render Circular Empty Seat Slot when no user is seated
+        {/* Empty seats are intentionally absent; only connected/created players occupy the table. */}
+        <div className="relative flex h-full w-full max-w-[1180px] justify-center px-1 py-2 md:max-h-[calc(100vh-76px)] md:px-[116px] md:py-[66px]">
+          <div className="table-ambient-ring" aria-hidden="true" />
+          {showDesktopSeats && visiblePlayers.map((player) => {
+            const seatIndex = Math.max(0, Math.min(5, player.id - 1));
             return (
-              <div key={`empty-seat-${idx}`} className={seatClass}>
-                <EmptySeatCard
-                  seatIndex={idx}
-                  onClick={() => setShowLobby(true)}
+              <div key={player.id} className={`z-20 ${seatPositions[seatIndex]}`}>
+                <PlayerSeatCard
+                  player={player}
+                  isActive={player.id === activePlayer?.id}
+                  seatIndex={seatIndex}
                 />
               </div>
             );

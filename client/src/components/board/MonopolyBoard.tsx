@@ -54,13 +54,8 @@ export const MonopolyBoard: React.FC<MonopolyBoardProps> = ({
 
   return (
     <div
-      className="aspect-square max-w-full max-h-full"
+      className="monopoly-board-frame z-10 aspect-square max-h-full max-w-full"
       style={{
-        /* Classic thick outer border like original board */
-        border: '6px solid #c8a951',
-        borderRadius: 6,
-        boxShadow: '0 8px 32px rgba(0,0,0,0.18), 0 2px 0 #a07830',
-        background: '#ffffff',
         height: '100%',
       }}
     >

@@ -1,0 +1,121 @@
+{
+  "sourceImage": "C:\\Users\\admin\\MyProject\\Monopoly\\client\\src\\assets\\references\\millionaire-cat-reference.png",
+  "zonesDir": "C:\\Users\\admin\\MyProject\\Monopoly\\client\\src\\three\\models\\millionaire-cat\\sculpt\\detail-grid",
+  "detailInventory": {
+    "scanMethod": "grid-3x3",
+    "targetMinDetails": 10,
+    "details": [
+      {
+        "id": "coin-rim-emboss",
+        "kind": "ridge",
+        "description": "Two concentric raised rims and a shallow house emblem on the gold coin.",
+        "region": { "x": 0.13, "y": 0.27, "width": 0.2, "height": 0.22, "units": "normalized" },
+        "scale": "meso",
+        "affects": "geometry, roughness, metalness",
+        "mapsTo": { "type": "component.localFeatures", "ref": "coin.coin-rim-emboss" },
+        "evidenceRef": "detail-grid/zone-r1c0.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "ear-inner-shells",
+        "kind": "contour",
+        "description": "Pink inset ear shells follow the orange triangular outer-ear silhouette.",
+        "region": { "x": 0.34, "y": 0.08, "width": 0.48, "height": 0.25, "units": "normalized" },
+        "scale": "meso",
+        "affects": "geometry, albedo, roughness",
+        "mapsTo": { "type": "component.localFeatures", "ref": "head.ear-inner-shells" },
+        "evidenceRef": "detail-grid/zone-r0c1.png",
+        "confidence": 0.91
+      },
+      {
+        "id": "fur-stripe-decals",
+        "kind": "decal",
+        "description": "Warm dark-orange forehead, cheek, arm and tail stripe groups identify the tabby cat.",
+        "region": { "x": 0.28, "y": 0.15, "width": 0.6, "height": 0.66, "units": "normalized" },
+        "scale": "meso",
+        "affects": "albedo, roughness",
+        "mapsTo": { "type": "material.localOverrides", "ref": "orange-vinyl.tabby-stripes" },
+        "evidenceRef": "detail-grid/zone-r0c1.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "laughing-face-linework",
+        "kind": "linework",
+        "description": "Raised cream brows and black closed crescent eyes frame the laughing expression.",
+        "region": { "x": 0.39, "y": 0.25, "width": 0.36, "height": 0.16, "units": "normalized" },
+        "scale": "micro",
+        "affects": "geometry, albedo",
+        "mapsTo": { "type": "component.localFeatures", "ref": "head.laughing-face-linework" },
+        "evidenceRef": "detail-grid/zone-r0c1.png",
+        "confidence": 0.95
+      },
+      {
+        "id": "mouth-cavity-set",
+        "kind": "hole",
+        "description": "Deep open mouth cavity contains a rounded tongue and two small white teeth.",
+        "region": { "x": 0.45, "y": 0.37, "width": 0.19, "height": 0.19, "units": "normalized" },
+        "scale": "meso",
+        "affects": "geometry, cavity AO, albedo",
+        "mapsTo": { "type": "component.localFeatures", "ref": "head.mouth-cavity-set" },
+        "evidenceRef": "detail-grid/zone-r1c1.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "gold-bow-and-buttons",
+        "kind": "gloss",
+        "description": "Metallic gold bow tie, vest buttons and pocket bars carry tight warm highlights.",
+        "region": { "x": 0.35, "y": 0.5, "width": 0.38, "height": 0.24, "units": "normalized" },
+        "scale": "meso",
+        "affects": "metalness, roughness, clearcoat",
+        "mapsTo": { "type": "material.localOverrides", "ref": "gold-metal.bow-buttons-highlight" },
+        "evidenceRef": "detail-grid/zone-r2c1.png",
+        "confidence": 0.92
+      },
+      {
+        "id": "vest-edge-seams",
+        "kind": "seam",
+        "description": "Raised dark-green vest perimeter and V-neck seams separate the fitted shell from the torso.",
+        "region": { "x": 0.31, "y": 0.52, "width": 0.42, "height": 0.24, "units": "normalized" },
+        "scale": "micro",
+        "affects": "geometry, AO, roughness",
+        "mapsTo": { "type": "component.localFeatures", "ref": "vest.vest-edge-seams" },
+        "evidenceRef": "detail-grid/zone-r2c1.png",
+        "confidence": 0.87
+      },
+      {
+        "id": "toe-bean-clusters",
+        "kind": "fastener",
+        "description": "Each cream foot has one large pad and three smaller raised pink toe beans.",
+        "region": { "x": 0.22, "y": 0.7, "width": 0.48, "height": 0.2, "units": "normalized" },
+        "scale": "micro",
+        "affects": "geometry, albedo, roughness",
+        "mapsTo": { "type": "component.localFeatures", "ref": "feet.toe-bean-clusters" },
+        "evidenceRef": "detail-grid/zone-r2c0.png",
+        "confidence": 0.95
+      },
+      {
+        "id": "tail-ring-system",
+        "kind": "linework",
+        "description": "Five broad dark-orange rings wrap the upward curled tail, ending in a cream tip.",
+        "region": { "x": 0.68, "y": 0.5, "width": 0.2, "height": 0.34, "units": "normalized" },
+        "scale": "meso",
+        "affects": "albedo, roughness",
+        "mapsTo": { "type": "material.localOverrides", "ref": "orange-vinyl.tail-rings" },
+        "evidenceRef": "detail-grid/zone-r2c2.png",
+        "confidence": 0.93
+      },
+      {
+        "id": "soft-vinyl-surface",
+        "kind": "gloss",
+        "description": "Subtle micro-grain and broad satin highlights make the body read as soft matte vinyl rather than flat color.",
+        "region": { "x": 0.24, "y": 0.08, "width": 0.64, "height": 0.82, "units": "normalized" },
+        "scale": "micro",
+        "affects": "roughness, normal, clearcoat",
+        "mapsTo": { "type": "material.localOverrides", "ref": "orange-vinyl.soft-vinyl-surface" },
+        "evidenceRef": "full-object",
+        "confidence": 0.78
+      }
+    ]
+  },
+  "authoringInstruction": "Authored from all nine zone crops; every detail maps to a component feature or material override used by the sculpt spec."
+}

@@ -1,0 +1,308 @@
+{
+  "targetName": "Millionaire Cat Token",
+  "sourceImage": "C:\\Users\\admin\\MyProject\\Monopoly\\client\\src\\assets\\references\\millionaire-cat-reference.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "stylized chibi cat board-game token",
+      "primaryDomain": "character",
+      "formLanguage": ["character-like", "organic", "sculptural", "rounded-toy"],
+      "structureKind": ["articulated assembly", "compound object", "conforming clothing shell"],
+      "motionPotential": ["whole-object transform", "articulated limbs", "bendable tail", "expression swap"],
+      "materialFamilies": ["vinyl", "cloth-like satin", "painted dielectric", "gold metal"],
+      "notes": "One original full-body chibi cat in a seated three-quarter pose. Front and lateral silhouette are clear; rear torso and back-of-head are inferred. Target is a stylized real-time game token, not maximum-likeness reconstruction."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 1,
+        "materialLayerCount": 2,
+        "localDetailDensity": 2,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 2
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 13,
+        "microFeatureGroups": 10,
+        "materialLayers": 6,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "The ellipsoid head, seated torso, four limb masses, curled tail, raised coin and fitted vest interrupt the silhouette.",
+        "Visible hierarchy requires separate head/face, torso/limbs/tail, wardrobe and coin assemblies.",
+        "Tabby stripes, toe beans and gold fittings form repeated systems; rear surfaces remain inferred from one view.",
+        "Named limb/tail pivots and event sockets are required for happy/sad money reactions."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Choose simple/moderate/complex/ultra-complex from observed structure, not from a hardcoded domain."
+    },
+    "unknownsToResolveBeforeImplementation": [
+      "Back-of-head stripe continuation is not visible; mirror the nearest observed forehead palette with 0.55 confidence.",
+      "Rear vest construction is hidden; continue the green shell as a simple symmetric back panel with 0.5 confidence.",
+      "Tail attachment is partly occluded by the right arm and torso; embed it into a rear-hip socket with 0.68 confidence."
+    ],
+    "detailInventory": {
+      "scanMethod": "grid-3x3",
+      "targetMinDetails": 10,
+      "note": "Enumerate every identity-defining small detail before authoring the spec. Each detail must map to a component.localFeatures entry or material.localOverrides entry, never prose only. Use forge/stage1_intake/build_detail_inventory.py to scan zones.",
+      "details": [
+        { "id": "coin-rim-emboss", "kind": "ridge", "description": "Concentric raised coin rims and house emblem.", "region": { "x": 0.13, "y": 0.27, "width": 0.2, "height": 0.22 }, "scale": "meso", "affects": "geometry, roughness, metalness", "mapsTo": { "type": "component.localFeatures", "ref": "coin.coin-rim-emboss" }, "evidenceRef": "detail-grid/zone-r1c0.png", "confidence": 0.94 },
+        { "id": "ear-inner-shells", "kind": "contour", "description": "Pink inset shells inside orange ears.", "region": { "x": 0.34, "y": 0.08, "width": 0.48, "height": 0.25 }, "scale": "meso", "affects": "geometry, albedo", "mapsTo": { "type": "component.localFeatures", "ref": "head.ear-inner-shells" }, "evidenceRef": "detail-grid/zone-r0c1.png", "confidence": 0.91 },
+        { "id": "fur-stripe-decals", "kind": "decal", "description": "Forehead, cheek, arm and tail tabby stripes.", "region": { "x": 0.28, "y": 0.15, "width": 0.6, "height": 0.66 }, "scale": "meso", "affects": "albedo, roughness", "mapsTo": { "type": "material.localOverrides", "ref": "orange-vinyl.tabby-stripes" }, "evidenceRef": "detail-grid/zone-r0c1.png", "confidence": 0.9 },
+        { "id": "laughing-face-linework", "kind": "linework", "description": "Cream brows and black crescent eyes.", "region": { "x": 0.39, "y": 0.25, "width": 0.36, "height": 0.16 }, "scale": "micro", "affects": "geometry, albedo", "mapsTo": { "type": "component.localFeatures", "ref": "head.laughing-face-linework" }, "evidenceRef": "detail-grid/zone-r0c1.png", "confidence": 0.95 },
+        { "id": "mouth-cavity-set", "kind": "hole", "description": "Open cavity, tongue and two teeth.", "region": { "x": 0.45, "y": 0.37, "width": 0.19, "height": 0.19 }, "scale": "meso", "affects": "geometry, cavity AO, albedo", "mapsTo": { "type": "component.localFeatures", "ref": "head.mouth-cavity-set" }, "evidenceRef": "detail-grid/zone-r1c1.png", "confidence": 0.96 },
+        { "id": "gold-bow-and-buttons", "kind": "gloss", "description": "Gold bow tie, buttons and pocket bars.", "region": { "x": 0.35, "y": 0.5, "width": 0.38, "height": 0.24 }, "scale": "meso", "affects": "metalness, roughness, clearcoat", "mapsTo": { "type": "material.localOverrides", "ref": "gold-metal.bow-buttons-highlight" }, "evidenceRef": "detail-grid/zone-r2c1.png", "confidence": 0.92 },
+        { "id": "vest-edge-seams", "kind": "seam", "description": "Raised perimeter and V-neck seams.", "region": { "x": 0.31, "y": 0.52, "width": 0.42, "height": 0.24 }, "scale": "micro", "affects": "geometry, AO, roughness", "mapsTo": { "type": "component.localFeatures", "ref": "vest.vest-edge-seams" }, "evidenceRef": "detail-grid/zone-r2c1.png", "confidence": 0.87 },
+        { "id": "toe-bean-clusters", "kind": "fastener", "description": "One large pad and three raised toe beans per foot.", "region": { "x": 0.22, "y": 0.7, "width": 0.48, "height": 0.2 }, "scale": "micro", "affects": "geometry, albedo", "mapsTo": { "type": "component.localFeatures", "ref": "feet.toe-bean-clusters" }, "evidenceRef": "detail-grid/zone-r2c0.png", "confidence": 0.95 },
+        { "id": "tail-ring-system", "kind": "linework", "description": "Five broad tail rings and cream tip.", "region": { "x": 0.68, "y": 0.5, "width": 0.2, "height": 0.34 }, "scale": "meso", "affects": "albedo, roughness", "mapsTo": { "type": "material.localOverrides", "ref": "orange-vinyl.tail-rings" }, "evidenceRef": "detail-grid/zone-r2c2.png", "confidence": 0.93 },
+        { "id": "soft-vinyl-surface", "kind": "gloss", "description": "Subtle micro-grain and broad satin highlights.", "region": { "x": 0.24, "y": 0.08, "width": 0.64, "height": 0.82 }, "scale": "micro", "affects": "roughness, normal, clearcoat", "mapsTo": { "type": "material.localOverrides", "ref": "orange-vinyl.soft-vinyl-surface" }, "evidenceRef": "full-object", "confidence": 0.78 }
+      ]
+    },
+    "anatomy": {
+      "applies": true,
+      "styleHeads": 2.2,
+      "proportions": {
+        "headUnit": 0.45,
+        "torso": 0.72,
+        "legs": 0.42,
+        "shoulderWidth": 1.32,
+        "hipWidth": 1.38
+      },
+      "pose": {
+        "type": "seated-asymmetric-coin-celebration",
+        "jointAngles": { "neck": [2, -4, 0], "leftShoulder": [8, 0, -18], "rightShoulder": [-28, 0, 62], "leftElbow": [24, 0, -22], "rightElbow": [8, 0, 38], "leftHip": [58, 0, -42], "rightHip": [58, 0, 42] }
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.44,
+        "eyeSpacing": 0.22,
+        "noseBase": 0.58,
+        "mouthLine": 0.75,
+        "hairline": 0.16,
+        "earTop": 0.0,
+        "earBottom": 0.37
+      },
+      "features": ["oversized ellipsoid head", "triangular inset ears", "closed crescent eyes", "open laughing mouth", "seated splayed feet", "raised coin arm", "curled striped tail"],
+      "confidence": 0.84,
+      "note": "Measured from landmark-overlay.png. Rear anatomy remains inferred from the single three-quarter view."
+    },
+    "sourceImage": "C:\\Users\\admin\\MyProject\\Monopoly\\client\\src\\assets\\references\\millionaire-cat-reference.png"
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "At the reference three-quarter view the model reads immediately as the same joyful seated millionaire cat: oversized head, inset ears, laughing face, green vest, raised gold coin, splayed paws and curled striped tail.",
+      "All limb, head, tail, coin and wardrobe assemblies are named, clickable and animation-ready for positive/negative money reactions at real-time board-game scale.",
+      "Neutral and grazing renders preserve separate vinyl, satin and metallic responses without relying on baked image lighting."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 8,
+      "microFeatureGroups": 5,
+      "materialLayers": 3,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "authoringInstruction": "Fill observed object class, complexity reasoning, featureGroups, visualDeltaChecks, and unknowns before generating or implementing ObjectSculptSpec.",
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Millionaire Cat Token stylized chibi cat vinyl toy character anatomy gold coin metallic PBR",
+    "index": {
+      "status": "rebuilt",
+      "reason": "missing",
+      "fingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8"
+    },
+    "matches": [
+      {
+        "record_id": "core.pbr-hand-painted-vs-pbr-texture",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[12]",
+        "score": 7.294208015119,
+        "snippets": [
+          "Distinguishes textures with lighting baked directly into color (static, stylized) from textures that respond dynamically to scene lighting via separate PBR channels. Phân biệt kết cấu có ánh sáng được nướng trực tiếp vào màu (tĩnh, cách điệu) ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[12]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-meshphysicalmaterial-core-pbr-fields",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[0]",
+        "score": 4.632717063119,
+        "snippets": [
+          "The baseline Three.js material exposing direct scalar/map fields for the standard PBR channel set. Vật liệu Three.js cơ bản cung cấp trực tiếp các trường vô hướng/bản đồ cho bộ kênh PBR tiêu chuẩn. Recognition cues: Use whenever a static ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[0]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-csg-boolean-operations-for-sub-mesh-composition",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[3]",
+        "score": 3.970370038002,
+        "snippets": [
+          "... sub-meshes procedurally instead of hand-modeling every variant. Hình học rắn cấu trúc (hợp/trừ/giao) để kết hợp hoặc cắt các sub-mesh vũ khí/dao theo thủ tục thay vì mô hình hóa thủ công từng biến thể. Recognition cues: Needed for ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[3]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  }
+}
