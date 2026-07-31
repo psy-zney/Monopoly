@@ -4,12 +4,14 @@ import { RoomManager } from '../rooms/RoomManager.js';
 
 interface CreateRoomPayload {
   playerName: string;
+  avatarId: number;
   playerCount?: number;
 }
 
 interface JoinRoomPayload {
   roomCode: string;
   playerName: string;
+  avatarId: number;
   sessionToken?: string;
 }
 
@@ -39,7 +41,7 @@ export function registerSocketHandlers(io: Server, roomManager = new RoomManager
   io.on('connection', (socket) => {
     socket.on('create_room', (payload: CreateRoomPayload) => {
       try {
-        const room = roomManager.createRoom(socket.id, payload.playerName, payload.playerCount);
+        const room = roomManager.createRoom(socket.id, payload.playerName, payload.avatarId, payload.playerCount);
         socket.join(room.roomCode);
         socket.emit('room_state', roomManager.makeSnapshot(room, socket.id));
       } catch (error) {
@@ -53,6 +55,7 @@ export function registerSocketHandlers(io: Server, roomManager = new RoomManager
           payload.roomCode,
           socket.id,
           payload.playerName,
+          payload.avatarId,
           payload.sessionToken
         );
         socket.join(room.roomCode);

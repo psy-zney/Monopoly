@@ -45,16 +45,17 @@ function generateSessionToken() {
 export class RoomManager {
   private readonly rooms = new Map<string, GameRoom>();
 
-  createRoom(socketId: string, playerName: string, playerCount = 6) {
+  createRoom(socketId: string, playerName: string, avatarId: number, playerCount = 6) {
     this.cleanup();
     const maxPlayers = Math.max(2, Math.min(6, playerCount));
     const roomCode = generateRoomCode(new Set(this.rooms.keys()));
+    const safeAvatarId = Math.max(1, Math.min(6, avatarId || 1));
     const gameState = {
       ...createInitialGameState(maxPlayers),
       roomCode,
     };
-    gameState.players = gameState.players.map((player, index) =>
-      index === 0 ? { ...player, name: playerName || player.name } : player
+    gameState.players = gameState.players.map((player) =>
+      player.id === safeAvatarId ? { ...player, name: playerName || player.name } : player
     );
 
     const room: GameRoom = {
@@ -62,8 +63,8 @@ export class RoomManager {
       gameState,
       players: [
         {
-          playerId: 1,
-          name: playerName || gameState.players[0].name,
+          playerId: safeAvatarId,
+          name: playerName || gameState.players[safeAvatarId - 1].name,
           socketId,
           sessionToken: generateSessionToken(),
           connected: true,
@@ -79,7 +80,7 @@ export class RoomManager {
     return room;
   }
 
-  joinRoom(roomCode: string, socketId: string, playerName: string, sessionToken?: string) {
+  joinRoom(roomCode: string, socketId: string, playerName: string, avatarId: number, sessionToken?: string) {
     const room = this.rooms.get(roomCode.toUpperCase());
     if (!room) throw new Error('Room not found.');
 
@@ -96,12 +97,16 @@ export class RoomManager {
     }
 
     if (room.players.length >= room.maxPlayers) throw new Error('Room is full.');
+    
+    const safeAvatarId = Math.max(1, Math.min(6, avatarId || 1));
+    if (room.players.some((p) => p.playerId === safeAvatarId)) {
+      throw new Error('Avatar already taken');
+    }
 
-    const playerId = room.players.length + 1;
-    const fallbackName = room.gameState.players[playerId - 1]?.name ?? `Player ${playerId}`;
+    const fallbackName = room.gameState.players[safeAvatarId - 1]?.name ?? `Player ${safeAvatarId}`;
     const name = playerName || fallbackName;
     room.players.push({
-      playerId,
+      playerId: safeAvatarId,
       name,
       socketId,
       sessionToken: generateSessionToken(),
@@ -111,7 +116,7 @@ export class RoomManager {
     room.gameState = {
       ...room.gameState,
       players: room.gameState.players.map((player) =>
-        player.id === playerId ? { ...player, name } : player
+        player.id === safeAvatarId ? { ...player, name } : player
       ),
     };
     room.updatedAt = Date.now();

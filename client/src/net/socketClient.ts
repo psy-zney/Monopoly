@@ -16,8 +16,8 @@ export interface RoomSnapshot {
 }
 
 export interface ClientToServerEvents {
-  create_room: (payload: { playerName: string; playerCount?: number }) => void;
-  join_room: (payload: { roomCode: string; playerName: string; sessionToken?: string }) => void;
+  create_room: (payload: { playerName: string; avatarId: number; playerCount?: number }) => void;
+  join_room: (payload: { roomCode: string; playerName: string; avatarId: number; sessionToken?: string }) => void;
   game_action: (payload: { roomCode: string; action: GameAction }) => void;
   leave_room: (payload: { roomCode: string }) => void;
 }

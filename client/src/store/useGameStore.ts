@@ -18,8 +18,8 @@ export interface GameStore {
   dispatch: (action: GameAction) => void;
   resetGame: (playerCount?: number) => void;
   connectSocket: () => void;
-  createOnlineRoom: (playerName: string, playerCount?: number) => void;
-  joinOnlineRoom: (roomCode: string, playerName: string) => void;
+  createOnlineRoom: (playerName: string, avatarId: number, playerCount?: number) => void;
+  joinOnlineRoom: (roomCode: string, playerName: string, avatarId: number) => void;
   leaveOnlineRoom: () => void;
 }
 
@@ -95,15 +95,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const socket = getSocket();
     if (!socket.connected) socket.connect();
   },
-  createOnlineRoom: (playerName: string, playerCount = 6) => {
+  createOnlineRoom: (playerName: string, avatarId: number, playerCount = 6) => {
     get().connectSocket();
-    getSocket().emit('create_room', { playerName, playerCount });
+    getSocket().emit('create_room', { playerName, avatarId, playerCount });
   },
-  joinOnlineRoom: (roomCode: string, playerName: string) => {
+  joinOnlineRoom: (roomCode: string, playerName: string, avatarId: number) => {
     get().connectSocket();
     getSocket().emit('join_room', {
       roomCode: roomCode.trim().toUpperCase(),
       playerName,
+      avatarId,
       sessionToken: get().online.sessionToken ?? undefined,
     });
   },
