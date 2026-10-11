@@ -1,0 +1,17 @@
+.meme-sticker-picker{position:relative;grid-column:1/-1;min-width:0}
+.meme-sticker-toggle{display:flex;align-items:center;gap:5px;background:transparent;color:#bdd4bb;border:0;border-radius:8px;padding:5px 8px;min-height:32px;font:inherit;font-size:12px;cursor:pointer}
+.meme-sticker-toggle[aria-expanded=true]{background:#ffffff12;color:#f0dda9}
+.meme-sticker-tray{position:absolute;bottom:calc(100% + 6px);left:0;right:0;z-index:3;background:#16383d;border:1px solid #7c997c80;border-radius:14px;padding:8px;box-shadow:0 8px 28px #0006;max-height:min(240px,50dvh);overflow:auto}
+.meme-sticker-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.meme-sticker-grid>button{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid transparent;background:#ffffff06;color:#dbe8d2;border-radius:10px;padding:5px;min-width:0;cursor:pointer}
+.meme-sticker-grid>button:hover{background:#ffffff14;border-color:#b4c69980}
+.meme-sticker-grid>button:disabled{opacity:.4;cursor:default}
+.meme-sticker-grid>button>span:last-child{font-size:10px;line-height:1.4}
+.meme-sticker-preview{display:flex;height:58px;align-items:center;justify-content:center;width:100%}
+.meme-sticker-preview img{width:100%;height:58px;object-fit:contain;display:block}
+.meme-sticker-tray>small{display:block;font-size:9px;padding:7px 2px 0;color:#a4b8a6}
+.meme-sticker-tray a{color:inherit;text-decoration:underline}
+.meme-sticker-message{position:relative;width:132px;max-width:100%;padding:4px 18px 4px 0}
+.meme-sticker-message img{display:block;width:112px;max-width:100%;height:96px;object-fit:contain}
+.meme-sticker-message>button{position:absolute;right:0;bottom:4px;width:24px;height:24px;border:1px solid #90a68c66;background:#16383d;color:#d5e4c9;border-radius:50%;font-size:10px;cursor:pointer;padding:0}
+.meme-sticker-toggle:focus-visible,.meme-sticker-grid>button:focus-visible,.meme-sticker-message>button:focus-visible{outline:2px solid #e8cea0;outline-offset:2px}

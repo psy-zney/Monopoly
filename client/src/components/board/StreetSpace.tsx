@@ -3,170 +3,228 @@ import { BoardSpaceData } from '../../core/constants/vietnameseBoardData';
 import { PropertyOwnershipState } from '../../core/types/game';
 import { TokenCluster } from './PlayerCircleToken';
 import { HouseHotelModel } from './HouseHotelModel';
-import { SIX_PLAYER_PRESETS } from '../../core/types/playerTokens';
+import { getPlayerPreset } from '../../core/types/playerTokens';
+import { formatCurrency, CurrencyType } from '../../core/types/currency';
 
 export interface StreetSpaceProps {
   space: BoardSpaceData;
   ownership?: PropertyOwnershipState;
   occupyingPlayerIds: number[];
+  activePlayerId?: number;
   positionSide: 'BOTTOM' | 'LEFT' | 'TOP' | 'RIGHT';
+  currency?: CurrencyType;
   onClick?: () => void;
+  isLandedTarget?: boolean;
 }
 
 const COLOR_BAR: Record<string, string> = {
-  BROWN:      '#8B4513',
-  LIGHT_BLUE: '#87CEEB',
-  PINK:       '#FF69B4',
-  ORANGE:     '#FF8C00',
-  RED:        '#FF0000',
-  YELLOW:     '#FFD700',
-  GREEN:      '#228B22',
-  DARK_BLUE:  '#00008B',
+  BROWN:      '#8b5a32',
+  LIGHT_BLUE: '#38bdf8',
+  PINK:       '#ec4899',
+  ORANGE:     '#f97316',
+  RED:        '#ef4444',
+  YELLOW:     '#eab308',
+  GREEN:      '#10b981',
+  DARK_BLUE:  '#2563eb',
 };
-
-const SPECIAL_BG: Record<string, { bg: string; icon: string; textColor: string }> = {
-  RAILROAD:        { bg: '#f1f5f9', icon: '🚌', textColor: '#1e293b' },
-  UTILITY_ELEC:    { bg: '#fefce8', icon: '💡', textColor: '#713f12' },
-  UTILITY_WATER:   { bg: '#eff6ff', icon: '🚰', textColor: '#1e3a5f' },
-  CHANCE:          { bg: '#dc2626', icon: '❓', textColor: '#ffffff' },
-  COMMUNITY_CHEST: { bg: '#0d9488', icon: '🎁', textColor: '#ffffff' },
-  TAX:             { bg: '#fbe9e7', icon: '💸', textColor: '#7f1d1d' },
-};
-
-const STRIP_H = 14; // px height of top/bottom color strip
-const STRIP_W = 14; // px width of left/right color strip
 
 export const StreetSpace: React.FC<StreetSpaceProps> = ({
   space,
   ownership,
   occupyingPlayerIds,
+  activePlayerId,
   positionSide,
+  currency = 'GOLD',
   onClick,
+  isLandedTarget = false,
 }) => {
-  const ownerPreset = ownership?.ownerId
-    ? SIX_PLAYER_PRESETS.find((p) => p.id === ownership.ownerId)
-    : null;
-
+  const ownerPreset = ownership?.ownerId ? getPlayerPreset(ownership.ownerId) : null;
   const barColor = space.colorGroup ? COLOR_BAR[space.colorGroup] : null;
 
-  const stripOnTop    = positionSide === 'TOP';
-  const stripOnBottom = positionSide === 'BOTTOM';
-  const stripOnLeft   = positionSide === 'LEFT';
-  const stripOnRight  = positionSide === 'RIGHT';
+  // Color bar orientation facing inward toward center hub
+  const stripOnTop    = positionSide === 'BOTTOM';
+  const stripOnRight  = positionSide === 'LEFT';
+  const stripOnBottom = positionSide === 'TOP';
+  const stripOnLeft   = positionSide === 'RIGHT';
+  const isVertical    = positionSide === 'LEFT' || positionSide === 'RIGHT';
 
-  const needsVertical = positionSide === 'LEFT' || positionSide === 'RIGHT';
-
-  // --- Get special config ---
-  const getSpecial = () => {
-    if (space.type === 'RAILROAD') return SPECIAL_BG.RAILROAD;
-    if (space.type === 'UTILITY')  return space.index === 12 ? SPECIAL_BG.UTILITY_ELEC : SPECIAL_BG.UTILITY_WATER;
-    if (space.type === 'CHANCE')   return SPECIAL_BG.CHANCE;
-    if (space.type === 'COMMUNITY_CHEST') return SPECIAL_BG.COMMUNITY_CHEST;
-    if (space.type === 'TAX')      return SPECIAL_BG.TAX;
+  // Specific visual configuration for Special Spaces with consistent vector design
+  const getSpecialConfig = () => {
+    if (space.type === 'RAILROAD') {
+      return {
+        bg: '#f8fafc',
+        icon: '🚌',
+        badge: 'BẾN XE',
+        textColor: '#0f172a',
+        badgeBg: '#e2e8f0',
+      };
+    }
+    if (space.type === 'UTILITY') {
+      return space.index === 12
+        ? {
+            bg: '#fffbeb',
+            icon: '💡',
+            badge: 'ĐIỆN LỰC',
+            textColor: '#78350f',
+            badgeBg: '#fef3c7',
+          }
+        : {
+            bg: '#eff6ff',
+            icon: '🚰',
+            badge: 'CẤP NƯỚC',
+            textColor: '#1e3a8a',
+            badgeBg: '#dbeafe',
+          };
+    }
+    if (space.type === 'CHANCE') {
+      return {
+        bg: '#efad95',
+        icon: '❓',
+        badge: 'CƠ HỘI',
+        textColor: '#663c32',
+      };
+    }
+    if (space.type === 'COMMUNITY_CHEST') {
+      return {
+        bg: '#a9c6b7',
+        icon: '🎁',
+        badge: 'KHÍ VẬN',
+        textColor: '#25483d',
+      };
+    }
+    if (space.type === 'TAX') {
+      return {
+        bg: '#fff1f2',
+        icon: '💸',
+        badge: 'NỘP THUẾ',
+        textColor: '#9f1239',
+        badgeBg: '#ffe4e6',
+      };
+    }
     return null;
   };
-  const special = getSpecial();
 
-  // Ownership indicator styles
-  const ownerBorderStyle = ownerPreset
-    ? { outline: `2.5px solid ${ownerPreset.colorHex}`, outlineOffset: '-2px' }
-    : {};
+  const special = getSpecialConfig();
 
-  const cellBg = special ? special.bg : (ownership?.isMortgaged ? '#f0f0f0' : '#ffffff');
+  // Clean owner border: subtle inner ring matching owner color
+  const ownerBorder = ownerPreset
+    ? `inset 0 0 0 2px ${ownerPreset.colorHex}`
+    : 'none';
 
-  // ── COLOR STRIP ──
-  const colorStrip = barColor ? (
-    <div
-      style={{
-        background: barColor,
-        ...(stripOnTop || stripOnBottom
-          ? { width: '100%', height: STRIP_H, display: 'flex', alignItems: 'center', justifycontent: 'center', flexShrink: 0 }
-          : { height: '100%', width: STRIP_W, display: 'flex', alignItems: 'center', justifycontent: 'center', flexShrink: 0 }),
-      }}
-    >
-      {!needsVertical && ownership && ownership.houses > 0 && (
-        <HouseHotelModel houses={ownership.houses} size="sm" />
-      )}
-    </div>
-  ) : null;
+  // Format shortName into lines cleanly
+  const displayNameLines = (space.shortName || space.name).split('\n');
 
-  // ── SPECIAL SPACES ──
+  // ── SPECIAL SPACES (Clean flat 2.5D with unified iconography) ──
   if (special) {
     return (
-      <div
+      <button
+        type="button"
         onClick={onClick}
-        className="relative flex flex-col items-center justify-between cursor-pointer overflow-hidden space-hover"
+        className={`board-space board-space-special relative flex flex-col items-center justify-between p-1 overflow-hidden select-none transition-all active:scale-[0.98] ${
+          isLandedTarget ? 'landed-spotlight-active z-30' : ''
+        }`}
         style={{
-          background: cellBg,
-          border: `1px solid ${special.bg === '#dc2626' || special.bg === '#0d9488' ? special.bg : '#c8a951'}`,
-          ...ownerBorderStyle,
+          background: special.bg,
+          boxShadow: ownerBorder,
         }}
+        aria-label={`${space.name}${space.price ? `, giá ${formatCurrency(space.price, currency)}` : ''}`}
       >
-        <div className="flex-1 flex flex-col items-center justify-center gap-0.5 px-0.5 py-1 w-full h-full text-center">
-          <span style={{ fontSize: 13 }}>{special.icon}</span>
-          <span
-            className="text-[8px] font-extrabold uppercase leading-tight break-words px-0.5"
+        <div className="board-space-body flex-1 flex flex-col items-center justify-center gap-0.5 w-full text-center">
+          <span className="board-space-icon text-base sm:text-lg leading-none select-none drop-shadow-xs">
+            {special.icon}
+          </span>
+          <div
+            className="board-space-name font-black text-[8px] sm:text-[9px] uppercase tracking-tight leading-tight select-none mt-0.5"
             style={{ color: special.textColor }}
           >
-            {space.name}
-          </span>
+            {displayNameLines.map((line, idx) => (
+              <span key={idx} className="block whitespace-nowrap">{line}</span>
+            ))}
+          </div>
           {space.price && (
-            <span className="text-[7.5px] font-bold" style={{ color: special.textColor, opacity: 0.8 }}>${space.price}</span>
+            <span
+              className="board-space-price mt-0.5 rounded px-1 py-0.2 font-mono text-[7px] sm:text-[8px] font-black"
+              style={{
+                background: special.badgeBg || '#ffffff40',
+                color: special.textColor,
+              }}
+            >
+              {formatCurrency(space.price, currency)}
+            </span>
           )}
         </div>
 
-        {/* Player tokens */}
+        {/* Player token cluster */}
         {occupyingPlayerIds.length > 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-            <TokenCluster playerIds={occupyingPlayerIds} size="sm" />
+            <TokenCluster playerIds={occupyingPlayerIds} size="sm" activePlayerId={activePlayerId} />
           </div>
         )}
-      </div>
+      </button>
     );
   }
 
   // ── PROPERTY SPACES ──
-  const isHorizontal = !needsVertical;
+  // Layout arrangement based on side
+  const flexDirection =
+    stripOnTop ? 'flex-col' :
+    stripOnBottom ? 'flex-col-reverse' :
+    stripOnLeft ? 'flex-row-reverse' : 'flex-row';
 
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
-      className={`relative cursor-pointer overflow-hidden space-hover ${ownership?.isMortgaged ? 'opacity-50 grayscale' : ''}`}
+      className={`board-space board-space-property relative flex overflow-hidden select-none transition-all active:scale-[0.98] ${flexDirection} ${
+        ownership?.isMortgaged ? 'opacity-50 grayscale' : ''
+      } ${isLandedTarget ? 'landed-spotlight-active z-30' : ''}`}
       style={{
-        background: cellBg,
-        border: '1px solid #c8a951',
-        display: 'flex',
-        flexDirection: (isHorizontal) ? 'column' : 'row',
-        ...ownerBorderStyle,
+        background: '#fffaf0',
+        boxShadow: ownerBorder,
       }}
+      aria-label={`${space.name}, giá ${formatCurrency(space.price ?? 0, currency)}${ownerPreset ? `, chủ ${ownerPreset.name}` : ''}`}
     >
-      {/* Color strip on outer edge */}
-      {(stripOnTop || stripOnLeft) && colorStrip}
+      {/* ── DEDICATED COLOR STRIP (Houses NEVER overlap text!) ── */}
+      {barColor && (
+        <div
+          className="property-group-strip shrink-0 flex items-center justify-center relative z-10 p-0.5"
+          data-orientation={isVertical ? 'vertical' : 'horizontal'}
+          style={{
+            background: barColor,
+            ...(isVertical ? { width: '18px', height: '100%' } : { width: '100%', height: '18px' }),
+          }}
+        >
+          {ownership && ownership.houses > 0 && (
+            <HouseHotelModel
+              houses={ownership.houses}
+              size="sm"
+              orientation={isVertical ? 'vertical' : 'horizontal'}
+            />
+          )}
+        </div>
+      )}
 
-      {/* Main body */}
-      <div
-        className="flex-1 flex flex-col items-center justify-center text-center gap-0.5 p-1 overflow-hidden w-full"
-      >
-        {ownership && ownership.houses > 0 && (
-          <div className="mb-0.5"><HouseHotelModel houses={ownership.houses} size="sm" /></div>
-        )}
-        <span className="text-[8px] font-extrabold text-slate-800 uppercase leading-tight break-words w-full">
-          {space.name}
-        </span>
+      {/* ── MAIN CONTENT (Name and Price) ── */}
+      <div className="board-space-body flex-1 flex flex-col items-center justify-between p-1 w-full text-center leading-tight">
+        <div className="board-space-name font-extrabold text-[8px] sm:text-[9px] uppercase tracking-tight text-slate-800 leading-tight mt-0.5">
+          {displayNameLines.map((line, idx) => (
+            <span key={idx} className="block whitespace-nowrap">{line}</span>
+          ))}
+        </div>
+
         {space.price && (
-          <span className="text-[7.5px] font-bold text-amber-700 leading-none">${space.price}</span>
+          <span className="board-space-price font-mono text-[7px] sm:text-[8px] font-black text-slate-600 bg-slate-100 rounded px-1 py-0.2">
+            {formatCurrency(space.price, currency)}
+          </span>
         )}
       </div>
 
-      {/* Color strip on inner edge */}
-      {(stripOnBottom || stripOnRight) && colorStrip}
-
-      {/* Player tokens */}
+      {/* Player token cluster */}
       {occupyingPlayerIds.length > 0 && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-          <TokenCluster playerIds={occupyingPlayerIds} size="sm" />
+          <TokenCluster playerIds={occupyingPlayerIds} size="sm" activePlayerId={activePlayerId} />
         </div>
       )}
-    </div>
+    </button>
   );
 };

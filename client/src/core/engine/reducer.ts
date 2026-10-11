@@ -1,8 +1,9 @@
 import { GameState, GameAction, PlayerState, PropertyOwnershipState } from '../types/game';
 import { BoardSpaceData, VIETNAMESE_BOARD_SPACES } from '../constants/vietnameseBoardData';
-import { SIX_PLAYER_PRESETS } from '../types/playerTokens';
+import { SIX_PLAYER_PRESETS, getPlayerPreset } from '../types/playerTokens';
+import { CurrencyType } from '../types/currency';
 
-const STARTING_CASH = 1500;
+const DEFAULT_STARTING_CASH = 1500;
 const PASS_GO_CASH = 200;
 const JAIL_POSITION = 10;
 const GO_TO_JAIL_POSITION = 30;
@@ -19,16 +20,16 @@ type TaxCardEvent =
 
 const CHANCE_TAX_EVENTS: TaxCardEvent[] = [
   ...CHANCE_TAX_POT_PERCENTAGES.map((percent) => ({ kind: 'COLLECT_POT' as const, percent, title: 'Cơ hội hoàn thuế' })),
-  { kind: 'CASH_TAX', percent: 10, title: 'Thuế tiền mặt đột xuất' },
+  { kind: 'CASH_TAX', percent: 10, title: 'Thuế thu nhập đột xuất' },
   { kind: 'FIXED_TAX', amount: 100, title: 'Phụ thu hành chính' },
-  { kind: 'POT_LEVY', percent: 20, title: 'Sung công quỹ' },
-  { kind: 'ASSET_AUDIT', percent: 10, title: 'Truy thu tài sản' },
+  { kind: 'POT_LEVY', percent: 20, title: 'Đóng góp hạ tầng' },
+  { kind: 'ASSET_AUDIT', percent: 10, title: 'Truy thu thuế tài sản' },
 ];
 
 const COMMUNITY_TAX_EVENTS: TaxCardEvent[] = [
   ...COMMUNITY_TAX_POT_PERCENTAGES.map((percent) => ({ kind: 'COLLECT_POT' as const, percent, title: 'Khí vận hoàn thuế' })),
-  { kind: 'CASH_TAX', percent: 10, title: 'Đóng góp cộng đồng' },
-  { kind: 'FIXED_TAX', amount: 200, title: 'Truy thu thuế cố định' },
+  { kind: 'CASH_TAX', percent: 10, title: 'Đóng góp công cộng' },
+  { kind: 'FIXED_TAX', amount: 200, title: 'Nộp phạt hành chính' },
   { kind: 'POT_LEVY', percent: 50, title: 'Bổ sung công quỹ' },
   { kind: 'ASSET_AUDIT', percent: 10, title: 'Kiểm kê tài sản' },
 ];
@@ -106,7 +107,7 @@ function resolveTaxCardEvent(state: GameState, players: PlayerState[], playerId:
     return {
       players: players.map((player) => player.id === playerId ? { ...player, cash: player.cash + payout } : player),
       taxPot: taxPot - payout,
-      message: `${event.title}: nhận ${event.percent}% quỹ thuế ($${payout}).`,
+      message: `${event.title}: nhận ${event.percent}% quỹ thuế (+${payout}).`,
     };
   }
 
@@ -123,7 +124,7 @@ function resolveTaxCardEvent(state: GameState, players: PlayerState[], playerId:
   return {
     players: charge.players,
     taxPot: taxPot + charge.paid,
-    message: `${event.title}: thuế $${roundToTen(taxAmount)}, đã trả $${charge.paid}${charge.debt ? `, ghi nợ $${charge.debt}` : ''}.`,
+    message: `${event.title}: thuế ${roundToTen(taxAmount)}, đã trả ${charge.paid}${charge.debt ? `, ghi nợ ${charge.debt}` : ''}.`,
   };
 }
 
@@ -265,19 +266,41 @@ function nextActivePlayerIndex(players: PlayerState[], currentIndex: number) {
   return currentIndex;
 }
 
-export function createInitialGameState(playerCount = 6): GameState {
-  const players: PlayerState[] = Array.from({ length: playerCount }).map((_, index) => ({
-    id: index + 1,
-    name: SIX_PLAYER_PRESETS[index]?.name || `Player ${index + 1}`,
-    cash: STARTING_CASH,
-    position: 0,
-    inJail: false,
-    jailTurns: 0,
-    getOutOfJailCards: 0,
-    taxDebt: 0,
-    taxDebtRounds: 0,
-    isBankrupt: false,
-  }));
+export function createInitialGameState(
+  playerCount = 6,
+  firstPlayerAvatarId?: number,
+  firstPlayerName?: string,
+  startingCash = DEFAULT_STARTING_CASH,
+  currency: CurrencyType = 'GOLD',
+  roomCode = 'LOCAL-88'
+): GameState {
+  const safeCount = Math.max(2, Math.min(6, playerCount || 6));
+  const availableAvatars = SIX_PLAYER_PRESETS.map(p => p.id);
+
+  if (firstPlayerAvatarId && availableAvatars.includes(firstPlayerAvatarId)) {
+    availableAvatars.splice(availableAvatars.indexOf(firstPlayerAvatarId), 1);
+    availableAvatars.unshift(firstPlayerAvatarId);
+  }
+
+  const players: PlayerState[] = Array.from({ length: safeCount }).map((_, index) => {
+    const avatarId = availableAvatars[index] ?? (index + 1);
+    const preset = getPlayerPreset(avatarId);
+    const defaultName = preset.name || `Đại Gia ${index + 1}`;
+    const name = (index === 0 && firstPlayerName) ? firstPlayerName : defaultName;
+
+    return {
+      id: avatarId,
+      name,
+      cash: startingCash,
+      position: 0,
+      inJail: false,
+      jailTurns: 0,
+      getOutOfJailCards: 0,
+      taxDebt: 0,
+      taxDebtRounds: 0,
+      isBankrupt: false,
+    };
+  });
 
   const properties: Record<number, PropertyOwnershipState> = {};
   VIETNAMESE_BOARD_SPACES.forEach((space) => {
@@ -292,7 +315,9 @@ export function createInitialGameState(playerCount = 6): GameState {
   });
 
   return {
-    roomCode: 'LOCAL',
+    roomCode,
+    currency,
+    startingCash,
     taxPot: 0,
     players,
     activePlayerIndex: 0,
@@ -301,7 +326,7 @@ export function createInitialGameState(playerCount = 6): GameState {
     hasRolled: false,
     doublesCount: 0,
     logs: [
-      createLog('Welcome to Doraemon Monopoly. Roll dice to begin.', 'INFO'),
+      createLog('Chào mừng đến với Cờ Tỷ Phú Việt Nam. Hãy tung xúc xắc để bắt đầu ván đấu!', 'INFO'),
     ],
     selectedSpaceIndex: null,
     auctionState: null,
@@ -311,7 +336,14 @@ export function createInitialGameState(playerCount = 6): GameState {
 export function reduceGameState(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case 'START_GAME': {
-      return createInitialGameState(Math.max(2, Math.min(6, action.playerNames.length || 6)));
+      return createInitialGameState(
+        Math.max(2, Math.min(6, action.playerNames.length || 6)),
+        undefined,
+        action.playerNames[0],
+        action.startingCash ?? state.startingCash,
+        action.currency ?? state.currency,
+        action.roomCode ?? state.roomCode
+      );
     }
 
     case 'ROLL_DICE': {
@@ -331,7 +363,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
       let nextPlayers = state.players;
       let nextProperties = state.properties;
       let nextTaxPot = state.taxPot ?? 0;
-      let logMessage = `${activePlayer.name} rolled ${die1} + ${die2} = ${rollSum}.`;
+      let logMessage = `${activePlayer.name} đổ được ${die1} + ${die2} = ${rollSum} nút.`;
 
       if (doublesCount >= 3) {
         nextPlayers = state.players.map((player) =>
@@ -346,7 +378,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
           hasRolled: true,
           doublesCount: 0,
           players: nextPlayers,
-          logs: [createLog(`${activePlayer.name} rolled three doubles and went to Jail.`, 'ALERT'), ...state.logs],
+          logs: [createLog(`${activePlayer.name} đổ 3 lần đôi liên tiếp và phải Vào Tù!`, 'ALERT'), ...state.logs],
         };
       }
 
@@ -355,11 +387,11 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
         nextPlayers = passGo.players;
         nextProperties = passGo.properties;
         nextTaxPot = passGo.taxPot;
-        logMessage += ` Passed GO and collected $${PASS_GO_CASH}.`;
-        if (passGo.surcharge) logMessage += ` Tax debt surcharge: +$${passGo.surcharge}.`;
-        if (passGo.paidAtDeadline) logMessage += ` Paid $${passGo.paidAtDeadline} at the three-lap deadline.`;
-        if (passGo.soldNames.length) logMessage += ` Sold ${passGo.soldNames.join(', ')} to settle tax debt.`;
-        if (passGo.becameBankrupt) logMessage += ' Could not settle tax debt after three laps and became bankrupt.';
+        logMessage += ` Đi qua ô Bắt Đầu (+${PASS_GO_CASH}).`;
+        if (passGo.surcharge) logMessage += ` Phí nợ thuế: +${passGo.surcharge}.`;
+        if (passGo.paidAtDeadline) logMessage += ` Đã nộp ${passGo.paidAtDeadline} khi hết hạn 3 vòng.`;
+        if (passGo.soldNames.length) logMessage += ` Tự động thanh lý ${passGo.soldNames.join(', ')} để trả nợ.`;
+        if (passGo.becameBankrupt) logMessage += ' Không đủ khả năng trả nợ sau 3 vòng và bị phá sản!';
       }
 
       const landedSpace = VIETNAMESE_BOARD_SPACES[nextPosition];
@@ -372,14 +404,14 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
             ? { ...player, position: JAIL_POSITION, inJail: true, jailTurns: 0 }
             : player
         );
-        logMessage += ' Went directly to Jail.';
+        logMessage += ' Bị giải vào Tù!';
       } else if (landedSpace.type === 'TAX') {
         const taxAmount = landedSpace.price || 100;
         nextPlayers = nextPlayers.map((player) => player.id === activePlayer.id ? { ...player, position: nextPosition } : player);
         const charge = chargeTax(nextPlayers, activePlayer.id, taxAmount);
         nextPlayers = charge.players;
         nextTaxPot += charge.paid;
-        logMessage += ` Paid ${landedSpace.name}: $${charge.paid} into the tax pot${charge.debt ? `, tax debt $${charge.debt}` : ''}.`;
+        logMessage += ` Nộp thuế ${landedSpace.name}: nộp ${charge.paid} vào quỹ thuế${charge.debt ? `, nợ thuế ${charge.debt}` : ''}.`;
       } else if (landedSpace.type === 'CHANCE' || landedSpace.type === 'COMMUNITY_CHEST') {
         nextPlayers = nextPlayers.map((player) =>
           player.id === activePlayer.id ? { ...player, position: nextPosition } : player
@@ -403,7 +435,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
             const gift = Math.min(visitor?.cash ?? 0, JAIL_VISIT_GIFT);
             if (gift <= 0) break;
             nextPlayers = transferCash(nextPlayers, activePlayer.id, jailedPlayer.id, gift);
-            logMessage += ` Gave $${gift} to ${jailedPlayer.name} while visiting Jail.`;
+            logMessage += ` Gửi tặng ${gift} thăm bạn tù ${jailedPlayer.name}.`;
           }
         }
 
@@ -413,7 +445,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
           if (rent > 0 && activeAfterPassGo.cash > 0) {
             nextPlayers = transferCash(nextPlayers, activePlayer.id, landedOwnership.ownerId, rent);
             const owner = state.players.find((player) => player.id === landedOwnership.ownerId);
-            logMessage += ` Paid $${rent} rent to ${owner?.name ?? 'owner'}.`;
+            logMessage += ` Trả tiền thuê ${rent} cho ${owner?.name ?? 'chủ đất'}.`;
           }
         }
       }
@@ -449,7 +481,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
           [spaceIndex]: { ...prop, ownerId: playerId },
         },
         auctionState: null,
-        logs: [createLog(`${player.name} bought ${space.name} for $${space.price}.`, 'ACTION'), ...state.logs],
+        logs: [createLog(`${player.name} đã mua ô đất ${space.name} giá ${space.price}.`, 'ACTION'), ...state.logs],
       };
     }
 
@@ -467,7 +499,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
           highestBidderId: null,
           passedPlayerIds: [],
         },
-        logs: [createLog(`${space.name} is open for auction.`, 'ALERT'), ...state.logs],
+        logs: [createLog(`${space.name} được đưa ra đấu giá công khai!`, 'ALERT'), ...state.logs],
       };
     }
 
@@ -486,7 +518,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
           highestBidderId: action.playerId,
           passedPlayerIds: auction.passedPlayerIds.filter((id) => id !== action.playerId),
         },
-        logs: [createLog(`${bidder.name} bid $${action.bidAmount}.`, 'ACTION'), ...state.logs],
+        logs: [createLog(`${bidder.name} trả giá ${action.bidAmount}.`, 'ACTION'), ...state.logs],
       };
     }
 
@@ -509,7 +541,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
       const space = VIETNAMESE_BOARD_SPACES[auction.spaceIndex];
 
       if (!auction.highestBidderId || auction.highestBid <= 0) {
-        return withLog({ ...state, auctionState: null }, `Auction closed with no buyer for ${space.name}.`, 'INFO');
+        return withLog({ ...state, auctionState: null }, `Đấu giá kết thúc không có người mua ô ${space.name}.`, 'INFO');
       }
 
       const winner = state.players.find((player) => player.id === auction.highestBidderId);
@@ -526,7 +558,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
           [auction.spaceIndex]: { ...prop, ownerId: winner.id },
         },
         auctionState: null,
-        logs: [createLog(`${winner.name} won ${space.name} for $${auction.highestBid}.`, 'ACTION'), ...state.logs],
+        logs: [createLog(`${winner.name} đã thắng đấu giá ô ${space.name} với giá ${auction.highestBid}.`, 'ACTION'), ...state.logs],
       };
     }
 
@@ -554,7 +586,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
           [spaceIndex]: { ...prop, houses: prop.houses + 1 },
         },
         logs: [
-          createLog(`${player.name} built on ${space.name} for $${buildCost}.`, 'ACTION'),
+          createLog(`${player.name} đã nâng cấp công trình trên ô ${space.name} (chi phí ${buildCost}).`, 'ACTION'),
           ...state.logs,
         ],
       };
@@ -574,7 +606,26 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
           ...state.properties,
           [action.spaceIndex]: { ...prop, isMortgaged: true },
         },
-        logs: [createLog(`${space.name} was mortgaged.`, 'PAYMENT'), ...state.logs],
+        logs: [createLog(`${space.name} đã được thế chấp để lấy tiền mặt.`, 'PAYMENT'), ...state.logs],
+      };
+    }
+
+    case 'SELL_PROPERTY': {
+      const prop = state.properties[action.spaceIndex];
+      const space = VIETNAMESE_BOARD_SPACES[action.spaceIndex];
+      if (!prop || prop.ownerId !== action.playerId || !space?.price || prop.houses > 0) return state;
+
+      const saleValue = roundToTen(space.price / 2);
+      return {
+        ...state,
+        players: state.players.map((player) =>
+          player.id === action.playerId ? { ...player, cash: player.cash + saleValue } : player
+        ),
+        properties: {
+          ...state.properties,
+          [action.spaceIndex]: { ...prop, ownerId: null, houses: 0, isMortgaged: false },
+        },
+        logs: [createLog(`${space.name} đã được bán lại cho ngân hàng (+${saleValue}).`, 'PAYMENT'), ...state.logs],
       };
     }
 
@@ -602,7 +653,7 @@ export function reduceGameState(state: GameState, action: GameAction): GameState
             ? { ...candidate, cash: availableCash - payment, taxDebt: remainingDebt, taxDebtRounds: remainingDebt === 0 ? 0 : candidate.taxDebtRounds, isBankrupt: candidate.isBankrupt || remainingDebt > 0 }
             : candidate
         ),
-        logs: [createLog(`${player.name} paid $${payment} toward tax debt${soldNames.length ? ` after selling ${soldNames.join(', ')}` : ''}.`, 'PAYMENT'), ...state.logs],
+        logs: [createLog(`${player.name} đã thanh toán ${payment} nợ thuế${soldNames.length ? ` sau khi bán ${soldNames.join(', ')}` : ''}.`, 'PAYMENT'), ...state.logs],
       };
     }
 

@@ -1,0 +1,12 @@
+{
+  "name": "monopoly-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r run dev"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

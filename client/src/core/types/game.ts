@@ -1,9 +1,10 @@
 import { BoardSpaceData } from '../constants/vietnameseBoardData';
+import { CurrencyType } from './currency';
 
 export interface PlayerState {
-  id: number;           // 1 to 6
+  id: number;           // 1 to 12+
   name: string;
-  cash: number;         // Starts at $1500
+  cash: number;         // Starting cash
   position: number;     // 0 to 39
   inJail: boolean;
   jailTurns: number;
@@ -29,6 +30,8 @@ export interface LogEntry {
 
 export interface GameState {
   roomCode: string;
+  currency: CurrencyType;
+  startingCash: number;
   taxPot: number;
   players: PlayerState[];
   activePlayerIndex: number;
@@ -48,7 +51,7 @@ export interface GameState {
 }
 
 export type GameAction =
-  | { type: 'START_GAME'; playerNames: string[] }
+  | { type: 'START_GAME'; playerNames: string[]; startingCash?: number; currency?: CurrencyType; roomCode?: string }
   | { type: 'ROLL_DICE'; forcedRoll?: [number, number] }
   | { type: 'END_TURN' }
   | { type: 'BUY_PROPERTY'; playerId: number; spaceIndex: number }
@@ -57,6 +60,7 @@ export type GameAction =
   | { type: 'PASS_AUCTION'; playerId: number }
   | { type: 'FINALIZE_AUCTION' }
   | { type: 'BUILD_HOUSE'; playerId: number; spaceIndex: number }
+  | { type: 'SELL_PROPERTY'; playerId: number; spaceIndex: number }
   | { type: 'MORTGAGE_PROPERTY'; playerId: number; spaceIndex: number }
   | { type: 'PAY_TAX_DEBT'; playerId: number }
   | { type: 'SELECT_SPACE'; spaceIndex: number | null };

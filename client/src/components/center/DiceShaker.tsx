@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Dices, Hand } from 'lucide-react';
+import { Dices, Hand, ZoomIn, ZoomOut } from 'lucide-react';
 import { gameAudio } from '../../audio/audioManager';
 
 interface DiceShakerProps {
@@ -8,6 +8,8 @@ interface DiceShakerProps {
   disabled?: boolean;
   lastDice?: [number, number];
   hasRolled?: boolean;
+  canRollAgain?: boolean;
+  variant?: 'table' | 'compact';
 }
 
 const DOT_POSITIONS: Record<number, [number, number][]> = {
@@ -20,20 +22,27 @@ const DOT_POSITIONS: Record<number, [number, number][]> = {
 };
 
 function DieFace({ value, size = 58 }: { value: number; size?: number }) {
-  const dots = DOT_POSITIONS[value] || DOT_POSITIONS[1];
+  const adjacent = [1, 2, 3, 4, 5, 6].filter((number) => number !== value && number !== 7 - value);
+  const faces = [
+    { side: 'front', number: value },
+    { side: 'back', number: 7 - value },
+    { side: 'right', number: adjacent[0] },
+    { side: 'left', number: 7 - adjacent[0] },
+    { side: 'top', number: adjacent[1] },
+    { side: 'bottom', number: 7 - adjacent[1] },
+  ];
   return (
-    <svg width={size} height={size} viewBox="0 0 100 100" className="dice-face" aria-label={`Xúc xắc ${value} nút`}>
-      <rect x="3" y="3" width="94" height="94" rx="20" fill="url(#die-fill)" stroke="#c9b36e" strokeWidth="4" />
-      <defs>
-        <linearGradient id="die-fill" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#ffffff" />
-          <stop offset="1" stopColor="#f8f0d6" />
-        </linearGradient>
-      </defs>
-      {dots.map(([cx, cy], index) => (
-        <circle key={index} cx={cx} cy={cy} r="8" fill={value === 1 ? '#dc2626' : '#17201b'} />
-      ))}
-    </svg>
+    <div className="dice-cube-scene" style={{ '--die-size': `${size}px` } as React.CSSProperties} role="img" aria-label={`Xúc xắc ${value} nút`}>
+      <div className="dice-cube">
+        {faces.map(({ side, number }) => (
+          <span key={side} className={`dice-cube-face dice-cube-face-${side}`}>
+            {DOT_POSITIONS[number].map(([x, y], index) => (
+              <i key={index} className={number === 1 ? 'dice-pip dice-pip-one' : 'dice-pip'} style={{ left: `${x}%`, top: `${y}%` }} />
+            ))}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -44,12 +53,19 @@ export const DiceShaker: React.FC<DiceShakerProps> = ({
   disabled = false,
   lastDice,
   hasRolled = false,
+  canRollAgain = false,
+  variant = 'table',
 }) => {
   const [phase, setPhase] = useState<Phase>(hasRolled ? 'result' : 'idle');
   const [result, setResult] = useState<[number, number]>(lastDice ?? [1, 1]);
+  const [diceZoom, setDiceZoom] = useState(1);
   const isHolding = useRef(false);
   const resolveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reduceMotion = Boolean(useReducedMotion());
+
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('monopoly:dice-phase', { detail: { phase } }));
+  }, [phase]);
 
   const startShake = useCallback(() => {
     if (disabled || phase === 'result' || phase === 'opening' || isHolding.current) return;
@@ -59,7 +75,7 @@ export const DiceShaker: React.FC<DiceShakerProps> = ({
   }, [disabled, phase]);
 
   const release = useCallback(() => {
-    if (!isHolding.current || phase !== 'shaking') return;
+    if (!isHolding.current || disabled) return;
     isHolding.current = false;
     const d1 = Math.floor(Math.random() * 6) + 1;
     const d2 = Math.floor(Math.random() * 6) + 1;
@@ -69,8 +85,8 @@ export const DiceShaker: React.FC<DiceShakerProps> = ({
     resolveTimer.current = setTimeout(() => {
       setPhase('result');
       onRollResult(d1, d2);
-    }, reduceMotion ? 120 : 460);
-  }, [onRollResult, phase, reduceMotion]);
+    }, reduceMotion ? 120 : 620);
+  }, [disabled, onRollResult, reduceMotion]);
 
   useEffect(() => {
     if (!hasRolled) {
@@ -90,12 +106,36 @@ export const DiceShaker: React.FC<DiceShakerProps> = ({
   );
 
   const instruction = disabled
-    ? 'Chờ lượt tiếp theo'
+    ? 'Chờ hành động tiếp theo'
     : phase === 'shaking'
       ? 'Thả tay để gieo!'
       : phase === 'opening'
         ? 'Đang mở bát…'
-        : 'Nhấn giữ để lắc';
+        : 'Chạm để gieo · giữ để lắc';
+
+  if (variant === 'compact') {
+    const rolling = phase === 'opening';
+    const showResult = hasRolled || rolling || phase === 'result';
+    return (
+      <div className={`mobile-dice-control ${rolling ? 'is-rolling' : ''}`}>
+        <div className="mobile-dice-readout" aria-live="polite">
+          <div className={`mobile-dice-pair ${showResult ? '' : 'is-preview'}`}>
+            <DieFace value={result[0]} size={38} />
+            <DieFace value={result[1]} size={38} />
+          </div>
+          <div><strong>{rolling ? 'Đang gieo…' : showResult ? `${result[0] + result[1]} bước` : 'Sẵn sàng gieo'}</strong><span>{showResult && result[0] === result[1] ? 'Đổ đôi' : 'Hai xúc xắc · mỗi lượt'}</span></div>
+        </div>
+        {(!disabled || rolling) && (
+          <button type="button" className="mobile-primary-action" disabled={rolling} onClick={() => {
+            if (disabled || phase === 'opening') return;
+            gameAudio.playSfx('diceShake');
+            isHolding.current = true;
+            release();
+          }}><Dices size={22} />{rolling ? 'Đang gieo xúc xắc' : canRollAgain ? 'Gieo tiếp · đổ đôi' : 'Gieo xúc xắc'}</button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="dice-console select-none">
@@ -119,7 +159,7 @@ export const DiceShaker: React.FC<DiceShakerProps> = ({
             onPointerUp={release}
             onPointerCancel={() => {
               isHolding.current = false;
-              if (phase === 'shaking') setPhase('idle');
+              setPhase('idle');
             }}
             onKeyDown={(event) => {
               if ((event.key === 'Enter' || event.key === ' ') && !event.repeat) {
@@ -139,7 +179,7 @@ export const DiceShaker: React.FC<DiceShakerProps> = ({
             whileTap={disabled ? undefined : { scale: 0.96 }}
           >
             <div className="dice-bowl-shadow" />
-            <svg width="126" height="116" viewBox="0 0 126 116" aria-hidden="true">
+            <svg width="148" height="136" viewBox="0 0 126 116" aria-hidden="true">
               <defs>
                 <linearGradient id="bowl-body" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0" stopColor="#f8dda0" />
@@ -172,20 +212,43 @@ export const DiceShaker: React.FC<DiceShakerProps> = ({
         ) : (
           <motion.div
             key="result"
-            className="dice-result-panel"
-            initial={{ opacity: 0, scale: 0.7, y: 12 }}
+            className="dice-result-panel dice-result-impact relative"
+            initial={{ opacity: 0, scale: 0.48, y: 26, rotate: -5 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.85 }}
-            transition={{ type: reduceMotion ? 'tween' : 'spring', stiffness: 360, damping: 22 }}
+            transition={{ type: reduceMotion ? 'tween' : 'spring', stiffness: 420, damping: 18 }}
+            role="status"
+            aria-live="polite"
           >
-            <div className="flex items-center gap-3">
-              <DieFace value={result[0]} />
-              <span className="text-xl font-black text-emerald-900/25">+</span>
-              <DieFace value={result[1]} />
+            {!reduceMotion && (
+              <div className="dice-impact-effects" aria-hidden="true">
+                <span className="dice-impact-ring" />
+                {Array.from({ length: 8 }).map((_, index) => (
+                  <i key={index} style={{ '--spark-index': index } as React.CSSProperties} />
+                ))}
+              </div>
+            )}
+            <div className="dice-result-head relative z-10 flex items-center justify-between gap-2">
+              <span className="dice-result-label">Kết quả xúc xắc</span>
+              <div className="dice-zoom-controls" aria-label="Phóng to thu nhỏ xúc xắc 3D">
+                <button type="button" onClick={() => setDiceZoom((zoom) => Math.max(0.8, +(zoom - 0.1).toFixed(1)))} disabled={diceZoom <= 0.8} aria-label="Thu nhỏ xúc xắc" title="Thu nhỏ xúc xắc"><ZoomOut size={13} /></button>
+                <span>{Math.round(diceZoom * 100)}%</span>
+                <button type="button" onClick={() => setDiceZoom((zoom) => Math.min(1.3, +(zoom + 0.1).toFixed(1)))} disabled={diceZoom >= 1.3} aria-label="Phóng to xúc xắc" title="Phóng to xúc xắc"><ZoomIn size={13} /></button>
+              </div>
             </div>
-            <div className="mt-2 flex items-center justify-center gap-2">
-              <span className="dice-total">{result[0] + result[1]}</span>
+            <div className="dice-result-line relative z-10 flex items-center justify-center gap-2" style={{ '--dice-zoom': diceZoom } as React.CSSProperties}>
+              <DieFace value={result[0]} />
+              <span className="dice-plus">+</span>
+              <DieFace value={result[1]} />
+              <span className="dice-result-steps">{result[0] + result[1]} <small>bước</small></span>
+            </div>
+            <div className="relative z-10 mt-1 flex items-center justify-center gap-2">
               {result[0] === result[1] && <span className="double-badge">🎉 Đổ đôi!</span>}
+              {canRollAgain && (
+                <button type="button" className="rounded-lg bg-emerald-700 px-2 py-1 text-[10px] font-black text-white hover:bg-emerald-800" onClick={() => setPhase('idle')}>
+                  Gieo tiếp
+                </button>
+              )}
             </div>
           </motion.div>
         )}

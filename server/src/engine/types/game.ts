@@ -57,6 +57,7 @@ export type GameAction =
   | { type: 'PASS_AUCTION'; playerId: number }
   | { type: 'FINALIZE_AUCTION' }
   | { type: 'BUILD_HOUSE'; playerId: number; spaceIndex: number }
+  | { type: 'SELL_PROPERTY'; playerId: number; spaceIndex: number }
   | { type: 'MORTGAGE_PROPERTY'; playerId: number; spaceIndex: number }
   | { type: 'PAY_TAX_DEBT'; playerId: number }
   | { type: 'SELECT_SPACE'; spaceIndex: number | null };

@@ -32,7 +32,7 @@ export const CardDeckModal: React.FC<CardDeckModalProps> = ({ deck, onClose }) =
   }, [onClose]);
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/45 p-3" onMouseDown={onClose}>
+    <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/45 p-3" onMouseDown={onClose}>
       <section
         aria-label={`Bộ thẻ ${title}`}
         aria-modal="true"

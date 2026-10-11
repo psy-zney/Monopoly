@@ -1,0 +1,2 @@
+import React from 'react';
+export const GameBrand: React.FC = () => <span className="game-brand"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="12" fill="#ed886d"/><path d="M10 21 20 12 30 21v10H10Z" fill="#fff6e9"/><path d="M8 21 20 10 32 21" fill="none" stroke="#172b37" strokeWidth="2.5" strokeLinecap="round"/><rect x="17" y="23" width="6" height="8" rx="1" fill="#172b37"/><circle cx="27" cy="11" r="3" fill="#f3c974"/></svg><span><strong>Cờ Tỷ Phú</strong><small>VIỆT NAM</small></span></span>;

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Skeleton } from '../ui/Skeleton';
 
 export interface GameLoadingScreenProps {
   onFinish: () => void;
@@ -8,99 +9,68 @@ export interface GameLoadingScreenProps {
 
 export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
   onFinish,
-  title = 'Doraemon Monopoly',
-  subtitle = 'Bản Miền Nam · Cờ Tỷ Phú Sài Gòn',
+  title = 'Cờ Tỷ Phú Việt Nam',
+  subtitle = 'Bản Đất Vàng · Miền Nam Sài Gòn',
 }) => {
   const [progress, setProgress] = useState(0);
   const [stepIndex, setStepIndex] = useState(0);
-  const [serverReady, setServerReady] = useState(false);
 
   const steps = [
-    'Đang tải dữ liệu bàn cờ Miền Nam...',
-    'Khởi tạo 40 ô đất, Nhà & Khách Sạn...',
-    'Đồng bộ luật chơi chuẩn Hasbro...',
-    'Đang kết nối & đánh thức máy chủ (Server)...',
-    'Đang kết nối & đánh thức máy chủ (Server)...', // Duplicate to hold at this step if waiting
+    'Đang nạp cấu trúc 40 ô bàn cờ Miền Nam...',
+    'Khởi tạo ô đất, Nhà & Khách Sạn cao cấp...',
+    'Đồng bộ luật chơi chuẩn Quốc tế & Thuế...',
+    'Thiết lập hiệu ứng bám sát góc nhìn camera...',
     'Hoàn tất! Sẵn sàng vào ván đấu...',
   ];
 
-  // Ping backend to wake it up
-  useEffect(() => {
-    let isMounted = true;
-    const url = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
-    
-    const pingServer = async () => {
-      try {
-        const response = await fetch(`${url}/health`);
-        if (response.ok && isMounted) {
-          setServerReady(true);
-        } else {
-          if (isMounted) setTimeout(pingServer, 2000);
-        }
-      } catch (error) {
-        // Server might be asleep, try again in 2 seconds
-        if (isMounted) setTimeout(pingServer, 2000);
-      }
-    };
-    
-    pingServer();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
   useEffect(() => {
     const startTime = Date.now();
-    const minDuration = 1500; // minimum loading time
+    const minDuration = 800; // Fast & smooth 800ms loading
 
     const timer = setInterval(() => {
       const elapsed = Date.now() - startTime;
-      let nextProgress = Math.floor((elapsed / minDuration) * 100);
-      
-      // If server isn't ready yet, hold progress at 85% maximum
-      if (!serverReady && nextProgress > 85) {
-        nextProgress = 85;
-      }
-      
-      if (nextProgress > 100) nextProgress = 100;
-      
+      let nextProgress = Math.min(100, Math.floor((elapsed / minDuration) * 100));
+
       setProgress(nextProgress);
 
       let nextStepIndex = Math.min(
         steps.length - 1,
         Math.floor((nextProgress / 100) * steps.length)
       );
-      
-      // Force step text to "Connecting" if waiting for server
-      if (!serverReady && nextProgress === 85) {
-        nextStepIndex = 3;
-      }
-      
+
       setStepIndex(nextStepIndex);
 
-      if (nextProgress >= 100 && serverReady) {
+      if (nextProgress >= 100) {
         clearInterval(timer);
         setTimeout(() => {
           onFinish();
-        }, 300);
+        }, 120);
       }
-    }, 40);
+    }, 25);
 
     return () => clearInterval(timer);
-  }, [onFinish, steps.length, serverReady]);
+  }, [onFinish, steps.length]);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-md px-4 select-none">
       {/* Background Decorative Glows */}
-      <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" />
-      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" />
+      <div className="absolute -top-24 -left-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" />
+      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" />
+
+      {/* Background Board Skeleton Preview to give immediate structure */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none p-6">
+        <div className="aspect-square w-full max-w-[650px] border-2 border-slate-700/60 rounded-3xl p-3 grid grid-cols-6 grid-rows-6 gap-2">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <Skeleton key={i} className="h-full w-full" />
+          ))}
+        </div>
+      </div>
 
       {/* Main Card */}
-      <div className="relative z-10 flex flex-col items-center max-w-sm w-full p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl">
-        {/* Hamster Loading Animation */}
-        <div className="mb-8">
-          <div aria-label="Orange and tan hamster running in a metal wheel" role="img" className="wheel-and-hamster">
+      <div className="relative z-10 flex flex-col items-center max-w-sm w-full p-7 rounded-3xl bg-slate-900/95 border border-slate-800 shadow-2xl">
+        {/* Animated Hamster Wheel */}
+        <div className="mb-6">
+          <div aria-label="Loading animation" role="img" className="wheel-and-hamster">
             <div className="wheel"></div>
             <div className="hamster">
               <div className="hamster__body">
@@ -122,25 +92,30 @@ export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
 
         {/* Title */}
         <h2
-          className="text-2xl font-black text-white uppercase tracking-wider mb-1 text-center"
+          className="text-xl sm:text-2xl font-black text-white uppercase tracking-wider mb-1 text-center"
           style={{ fontFamily: 'Baloo 2, cursive' }}
         >
           {title}
         </h2>
-        <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-8 text-center">
+        <p className="text-[11px] font-bold text-amber-400 uppercase tracking-widest mb-5 text-center">
           {subtitle}
         </p>
 
+        {/* Shimmering Skeleton Preview of Seats */}
+        <div className="flex items-center gap-2 mb-4 w-full justify-center">
+          <Skeleton variant="circle" width={28} height={28} />
+          <Skeleton variant="text" width={70} height={14} />
+          <Skeleton variant="circle" width={28} height={28} />
+          <Skeleton variant="text" width={70} height={14} />
+          <Skeleton variant="circle" width={28} height={28} />
+        </div>
+
         {/* Progress Bar */}
-        <div className="w-full h-3.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700/60 mb-4 relative">
+        <div className="w-full h-3 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700/60 mb-3 relative">
           <div
-            className="h-full bg-gradient-to-r from-blue-500 via-amber-400 to-emerald-400 rounded-full transition-all duration-100 ease-out shadow-sm"
+            className="h-full bg-gradient-to-r from-amber-500 via-emerald-400 to-cyan-400 rounded-full transition-all duration-100 ease-out shadow-sm"
             style={{ width: `${progress}%` }}
           />
-          {/* Waiting for server pulse effect */}
-          {!serverReady && progress === 85 && (
-            <div className="absolute inset-0 bg-white/20 animate-pulse rounded-full" />
-          )}
         </div>
 
         {/* Step Status Text */}
@@ -152,4 +127,3 @@ export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
     </div>
   );
 };
-

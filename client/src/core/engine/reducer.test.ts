@@ -170,3 +170,26 @@ describe('ten-dollar denominations', () => {
     expect(next).toBe(state);
   });
 });
+
+describe('property sale', () => {
+  it('returns an unimproved property to the bank for half price', () => {
+    const state = createInitialGameState(2);
+    state.properties[1].ownerId = state.players[0].id;
+
+    const next = reduceGameState(state, { type: 'SELL_PROPERTY', playerId: state.players[0].id, spaceIndex: 1 });
+
+    expect(next.players[0].cash).toBe(1530);
+    expect(next.properties[1].ownerId).toBeNull();
+    expect(next.properties[1].isMortgaged).toBe(false);
+  });
+
+  it('does not sell a property while it still has buildings', () => {
+    const state = createInitialGameState(2);
+    state.properties[1].ownerId = state.players[0].id;
+    state.properties[1].houses = 1;
+
+    const next = reduceGameState(state, { type: 'SELL_PROPERTY', playerId: state.players[0].id, spaceIndex: 1 });
+
+    expect(next).toBe(state);
+  });
+});

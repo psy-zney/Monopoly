@@ -3,51 +3,50 @@ import React from 'react';
 export interface HouseHotelModelProps {
   houses: number; // 0–4 = houses, 5 = hotel
   size?: 'sm' | 'md';
+  orientation?: 'horizontal' | 'vertical';
 }
 
-export const HouseHotelModel: React.FC<HouseHotelModelProps> = ({ houses, size = 'sm' }) => {
+export const HouseHotelModel: React.FC<HouseHotelModelProps> = ({
+  houses,
+  size = 'sm',
+  orientation = 'horizontal',
+}) => {
   if (houses <= 0) return null;
 
-  const houseSize = size === 'sm' ? 8 : 12;
-  const hotelSize = size === 'sm' ? 12 : 16;
+  const houseSize = size === 'sm' ? 7 : 11;
+  const hotelSize = size === 'sm' ? 14 : 20;
+  const isVertical = orientation === 'vertical';
 
   if (houses >= 5) {
     return (
       <div
-        title="Khách Sạn"
+        title="Khách Sạn Cao Cấp"
+        className="board-hotel shrink-0 flex items-center justify-center"
         style={{
           width: hotelSize,
           height: hotelSize,
-          background: 'linear-gradient(145deg, #ef4444, #b91c1c)',
-          borderRadius: 2,
-          border: '1px solid rgba(255,100,100,0.5)',
-          boxShadow: '0 2px 6px rgba(239,68,68,0.6)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: houseSize - 3,
-          fontWeight: 900,
-          color: '#fef2f2',
+          fontSize: houseSize - 1,
         }}
       >
-        H
+        <span aria-hidden="true">H</span>
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-      {Array.from({ length: houses }).map((_, i) => (
+    <div
+      className={`board-house-grid ${isVertical ? 'is-vertical' : ''}`}
+      aria-label={`${houses} nhà`}
+    >
+      {Array.from({ length: Math.min(4, houses) }).map((_, i) => (
         <div
           key={i}
-          title={`Nhà ${i + 1}`}
+          title={`Nhà cấp ${i + 1}`}
+          className="board-house"
           style={{
             width: houseSize,
             height: houseSize,
-            background: 'linear-gradient(145deg, #22c55e, #15803d)',
-            borderRadius: 2,
-            border: '1px solid rgba(74,222,128,0.4)',
-            boxShadow: '0 2px 4px rgba(22,163,74,0.5)',
+
           }}
         />
       ))}
